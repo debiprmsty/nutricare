@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nutricare/auth/loginPage.dart';
+import 'package:nutricare/pages/HomePage.dart';
 
 void main() {
   runApp(const MyApp());

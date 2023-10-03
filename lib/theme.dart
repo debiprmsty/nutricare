@@ -6,6 +6,7 @@ Color birumuda = const Color(0xFF00D7FF);
 Color birucyan = const Color(0xFF72FFFF);
 
 TextStyle mooli = const TextStyle(fontFamily: 'Mooli');
+TextStyle poppins = const TextStyle(fontFamily: 'Poppins');
 TextStyle league = const TextStyle(fontFamily: 'LeagueSpartan');
 TextStyle ysabeau = const TextStyle(fontFamily: 'YsabeauInfant');
 TextStyle inclusiveSans = const TextStyle(fontFamily: 'InclusiveSans');

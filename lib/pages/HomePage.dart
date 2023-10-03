@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nutricare/components/Slider.dart';
 import 'package:nutricare/theme.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,6 +10,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  List<Map<String,dynamic>> artikels = [
+    {
+      "penulis":"Debi Pramesty",
+      "tanggal":"2023-10-02",
+      "gambar" : "assets/images/artikel1.jpg",
+      "judul" : "Ikan Bergizi Tinggi Sehat dan Enak"
+    },
+    {
+      "penulis":"Debi Pramesty",
+      "tanggal":"2023-10-02",
+      "gambar" : "assets/images/artikel2.jpg",
+      "judul" : "Aksi Bersama Cegah Stunting dan Obesitas"
+    },
+    {
+      "penulis":"Debi Pramesty",
+      "tanggal":"2023-10-02",
+      "gambar" : "assets/images/artikel3.png",
+      "judul" : "Cegah Stunting itu Penting !!!"
+    }
+  ];
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -22,153 +45,321 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Container(
                   alignment: Alignment.topCenter,
-                  padding: const EdgeInsets.only(top: 50, left: 12, right: 20),
+                   padding: const EdgeInsets.only(top: 50, left: 18, right: 18),
                   width: width,
-                  height: height * 0.25,
+                  height: height * 0.25 + 180,
                   decoration: BoxDecoration(
                     color: biruungu,
                     borderRadius: BorderRadius.only(bottomLeft: Radius.circular(35), bottomRight: Radius.circular(35))
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              CircleAvatar(
+                                radius: 28,
+                                backgroundImage: AssetImage("assets/images/user2.jpg"),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Hello!", style: mooli.copyWith(fontSize: 30, color: Colors.yellow[600], fontWeight: FontWeight.bold),),
-                                  Text("Debi Pramesty", style: inclusiveSans.copyWith(fontSize: 23, color: Colors.white),)
+                                  Text("Petugas", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.white),),
+                                  Text("Debi Pramesty", style: inclusiveSans.copyWith(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold),)
                                 ],
                               ),
-                              Image.asset("assets/images/avatar.png", width: 35, height: 35,)
                             ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Icon(Icons.notifications, color: Colors.white, size: 30,),
                           ),
                         ],
                       ),
-                      
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      Container(
+                        width: width,
+                        height: 170,
+                        child: SliderHome(),
+                      )
+                    ],
+                  ),    
                 ),
                 Container(
-                  height: 800,
+                  padding: const EdgeInsets.only(top: 100, left: 18, right: 18),
+                  height: height - 200,
                   width: width,
-                  color: Colors.white,
-                )
-              ],
-            ),
-            Positioned(
-              top: 150,
-              left: 30,
-              right: 30,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                width: 100,
-                height: 110,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                    borderRadius: BorderRadius.circular(8), // Warna latar belakang container
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey, // Warna bayangan
-                        offset: Offset(0, 2.5), // Offset bayangan (x, y)
-                        blurRadius: 5,
-                        spreadRadius:0, // Radius penyebaran bayangan
+                  color: Colors.grey[200],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Kategori Index", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w700),),
+                      SizedBox(
+                        width: width,
+                        height: 212,
+                        child:GridView.count(
+                          padding: EdgeInsets.only(top: 10),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 6/3,
+                          shrinkWrap: false,
+                          children: [
+                            Card(
+                              color: Colors.white,
+                              elevation: 8, shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ), 
+                              child: Row(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.all(0),
+                                    width: 80,
+                                    height: height,
+                                    decoration:BoxDecoration(
+                                      color: biruungu,
+                                      borderRadius: BorderRadius.circular(7)
+                                    ),
+                                    child: Image.asset("assets/icons/weight.png", scale: 1.3,),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text("Berat\nBadan\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 12, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
+                                ],
+                              ),
+                            ),
+                            Card(
+                              color: Colors.white,
+                              elevation: 8, shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ), 
+                              child: Row(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.all(0),
+                                    width: 80,
+                                    height: height,
+                                    decoration:BoxDecoration(
+                                      color: biruungu,
+                                      borderRadius: BorderRadius.circular(7)
+                                    ),
+                                    child: Image.asset("assets/icons/height.png", scale: 1.3,),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text("Tinggi\nBadan\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 12, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
+                                ],
+                              ),
+                            ),
+                            Card(
+                              color: Colors.white,
+                              elevation: 8, shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ), 
+                              child: Row(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.all(0),
+                                    width: 80,
+                                    height: height,
+                                    decoration:BoxDecoration(
+                                      color: biruungu,
+                                      borderRadius: BorderRadius.circular(7)
+                                    ),
+                                    child: Image.asset("assets/icons/hwicon.png", scale: 1.3,),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text("Berat\nBadan\nmenurut\nTinggi Badan", style: inclusiveSans.copyWith(fontSize: 11.5, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
+                                ],
+                              ),
+                            ),
+                            Card(
+                              color: Colors.white,
+                              elevation: 8, shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ), 
+                              child: Row(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.all(0),
+                                    width: 80,
+                                    height: height,
+                                    decoration:BoxDecoration(
+                                      color: biruungu,
+                                      borderRadius: BorderRadius.circular(7)
+                                    ),
+                                    child: Image.asset("assets/icons/massa.png", scale: 1.3,),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text("Indeks\nMassa Tubuh\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 11.5, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Blog Kegiatan", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w700),),
+                          TextButton(onPressed: (){}, child: Text("Lihat Semua",style: inclusiveSans.copyWith(fontSize: 13, color: biruungu, fontWeight: FontWeight.w700),))
+                        ],
+                      ),
+                      Container(
+                        width: width,
+                        height: 240,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          shrinkWrap: false,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: artikels.length,
+                          itemBuilder: (BuildContext context,index) {
+                            final artikel = artikels[index];
+                            print(artikel);
+                            return Container(
+                              margin: const EdgeInsets.only(top: 5, right: 16),
+                              width: 300,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15), // Warna latar belakang container
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(255, 232, 232, 232), // Warna bayangan
+                                    offset: Offset(0, 2.5), // Offset bayangan (x, y)
+                                    blurRadius: 0.5,
+                                    spreadRadius: 0.0, // Radius penyebaran bayangan
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15)),
+                                    child: Image.asset(artikel['gambar'],fit: BoxFit.cover,width: width, height: 135,)),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(Icons.person,color: Colors.grey[500],size: 16,),
+                                            const SizedBox(width: 6,),
+                                            Text(artikel['penulis'],style:inclusiveSans.copyWith(fontSize: 12,fontWeight: FontWeight.w600,color: Colors.grey[500]))
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.calendar_month,color: Colors.grey[500],size: 16,),
+                                            const SizedBox(width: 6,),
+                                            Text(artikel['tanggal'],style:inclusiveSans.copyWith(fontSize: 12,fontWeight: FontWeight.w600,color: Colors.grey[500]))
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    child: Text(artikel['judul'],style: inclusiveSans.copyWith(fontSize: 15,fontWeight: FontWeight.bold),),
+                                  )
+                                ],
+                              ),
+                            );
+                          }
+                        ),
                       ),
                     ],
                   ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("72",style: inclusiveSans.copyWith(fontWeight: FontWeight.bold,color: biruungu,fontSize: 42),),
-                        const SizedBox(height: 5,),
-                        Text.rich(
-                          textAlign: TextAlign.center,
-                          TextSpan(
-                            text: "Data \n",
-                            style: inclusiveSans.copyWith(color: biruungu, fontSize: 15, fontWeight: FontWeight.w600),
-                            children: [
-                              TextSpan(
-                                text: 'Orang Tua',
-                                style: inclusiveSans.copyWith(fontWeight: FontWeight.w500, color: biruungu, fontSize: 12,),
-                              )
-                            ]
-                          )
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("15",style: inclusiveSans.copyWith(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 42),),
-                        const SizedBox(height: 5,),
-                        Text.rich(
-                          textAlign: TextAlign.center,
-                          TextSpan(
-                            text: "Data \n",
-                            style: inclusiveSans.copyWith(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w600),
-                            children: [
-                              TextSpan(
-                                text: 'Balita',
-                                style: inclusiveSans.copyWith(fontWeight: FontWeight.w500, color: Colors.black, fontSize: 12,),
-                              )
-                            ]
-                          )
-                        ),
-                      ],
-                    ),
-                   Container(
-                    height: height,
-                    width: 1,
-                    color: Colors.grey[300],
-                   ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("58",style: inclusiveSans.copyWith(fontWeight: FontWeight.bold,color: biruungu,fontSize: 42),),
-                        const SizedBox(height: 5,),
-                        Text.rich(
-                          textAlign: TextAlign.center,
-                          TextSpan(
-                            text: "Data Balita\n",
-                            style: inclusiveSans.copyWith(color: biruungu, fontSize: 15, fontWeight: FontWeight.w600),
-                            children: [
-                              TextSpan(
-                                text: 'laki-laki',
-                                style: inclusiveSans.copyWith(fontWeight: FontWeight.w500, color: biruungu, fontSize: 12,),
-                              )
-                            ]
-                          )
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("7",style: inclusiveSans.copyWith(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 42),),
-                        const SizedBox(height: 5,),
-                        Text.rich(
-                          textAlign: TextAlign.center,
-                          TextSpan(
-                            text: "Data Balita\n",
-                            style: inclusiveSans.copyWith(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w600),
-                            children: [
-                              TextSpan(
-                                text: 'Perempuan',
-                                style: inclusiveSans.copyWith(fontWeight: FontWeight.w500, color: Colors.black, fontSize: 12,),
-                              )
-                            ]
-                          )
-                        ),
-                      ],
+                ),
+              ],
+            ),
+            Positioned(
+              left: 20,
+              right: 20,
+              top: height * 0.25 + 95,
+              child: Container(
+                height: 160,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8), // Warna latar belakang container
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromARGB(255, 232, 232, 232), // Warna bayangan
+                      offset: Offset(0, 2.5), // Offset bayangan (x, y)
+                      blurRadius: 0.5,
+                      spreadRadius: 0.0, // Radius penyebaran bayangan
                     ),
                   ],
                 ),
-               ),
-            )
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Data Orang Tua", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text("100", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                          const SizedBox(
+                            height: 14,
+                          ),
+                          Text("Data Balita", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text("100", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Data Balita Perempuan", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text("50", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                          const SizedBox(
+                            height: 14,
+                          ),
+                          Text("Data Balita Laki-Laki", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text("50", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ),
           ],
         ),
       ),
