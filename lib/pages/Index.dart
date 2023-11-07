@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nutricare/pages/HomePage.dart';
 import 'package:nutricare/pages/ProfilePage.dart';
 import 'package:nutricare/pages/ReportPage.dart';
+import 'package:nutricare/pages/kategori/BBmenurutUmur.dart';
 import 'package:nutricare/pages/loggingPage.dart';
 import 'package:nutricare/theme.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';

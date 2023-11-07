@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nutricare/auth/loginPage.dart';
-import 'package:nutricare/pages/HomePage.dart';
+import 'package:nutricare/SplashScreen.dart';
+import 'package:nutricare/theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,10 +12,22 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'NUTRICARE',
       debugShowCheckedModeBanner: false,
-      home: LoginPage()
+      home: SplashScreen(),
+      theme: ThemeData(
+        datePickerTheme: DatePickerThemeData(
+          headerBackgroundColor: biruungu,
+          todayBackgroundColor: MaterialStatePropertyAll(biruungu),
+          dayStyle: poppins,
+          surfaceTintColor: Colors.white,
+          rangeSelectionBackgroundColor: biruungu,
+          headerHeadlineStyle: poppins,
+          rangePickerBackgroundColor: biruungu
+        )
+      ),
     );
   }
 }

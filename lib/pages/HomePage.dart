@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:nutricare/api/user.dart';
 import 'package:nutricare/components/Slider.dart';
+import 'package:nutricare/models/User.dart';
+import 'package:nutricare/pages/kategori/BBmenurutTB.dart';
+import 'package:nutricare/pages/kategori/BBmenurutUmur.dart';
+import 'package:nutricare/pages/kategori/IMTmenurutUmur.dart';
+import 'package:nutricare/pages/kategori/TBmenurutUmur.dart';
 import 'package:nutricare/theme.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,6 +38,21 @@ class _HomePageState extends State<HomePage> {
     }
   ];
 
+  final UserController _userController = UserController();
+  late User _activeUser = User(id: 0, fullname: "", role: "", image: "");
+
+  @override
+  void initState() {
+    super.initState();
+    _userController.fetchUser().then((value) => {
+      if (value != null) {
+        setState(() {
+          _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image']);
+        })
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -45,13 +66,10 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Container(
                   alignment: Alignment.topCenter,
-                   padding: const EdgeInsets.only(top: 50, left: 18, right: 18),
+                  padding: const EdgeInsets.only(top: 50, left: 18, right: 18),
                   width: width,
                   height: height * 0.25 + 180,
-                  decoration: BoxDecoration(
-                    color: biruungu,
-                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(35), bottomRight: Radius.circular(35))
-                  ),
+                  color: biruungu,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -63,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               CircleAvatar(
                                 radius: 28,
-                                backgroundImage: AssetImage("assets/images/user2.jpg"),
+                                backgroundImage: _activeUser.image != "" ? NetworkImage("https://testchairish.000webhostapp.com/api/user-image/${_activeUser.image}",) : NetworkImage("https://afpertise.com/media/2020/09/Member-1.jpg",) ,
                               ),
                               const SizedBox(
                                 width: 10,
@@ -71,8 +89,11 @@ class _HomePageState extends State<HomePage> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Petugas", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.white),),
-                                  Text("Debi Pramesty", style: inclusiveSans.copyWith(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold),)
+                                  Text(_activeUser.role, style: inclusiveSans.copyWith(fontSize: 23, color: Colors.white, fontWeight: FontWeight.bold),),
+                                  const SizedBox(
+                                    height: 3,
+                                  ),
+                                  Text(_activeUser.fullname, style: inclusiveSans.copyWith(fontSize: 18, color: Colors.white),),
                                 ],
                               ),
                             ],
@@ -114,100 +135,128 @@ class _HomePageState extends State<HomePage> {
                           childAspectRatio: 6/3,
                           shrinkWrap: false,
                           children: [
-                            Card(
-                              color: Colors.white,
-                              elevation: 8, shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ), 
-                              child: Row(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.all(0),
-                                    width: 80,
-                                    height: height,
-                                    decoration:BoxDecoration(
-                                      color: biruungu,
-                                      borderRadius: BorderRadius.circular(7)
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context){
+                                  return const BBmenurutUmurPage();
+                                }));
+                              },
+                              child: Card(
+                                color: Colors.white,
+                                elevation: 8, shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ), 
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.all(0),
+                                      width: 80,
+                                      height: height,
+                                      decoration:BoxDecoration(
+                                        color: biruungu,
+                                        borderRadius: BorderRadius.circular(7)
+                                      ),
+                                      child: Image.asset("assets/icons/weight.png", scale: 1.3,),
                                     ),
-                                    child: Image.asset("assets/icons/weight.png", scale: 1.3,),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("Berat\nBadan\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 12, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
-                                ],
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text("Berat\nBadan\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 12, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
+                                  ],
+                                ),
                               ),
                             ),
-                            Card(
-                              color: Colors.white,
-                              elevation: 8, shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ), 
-                              child: Row(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.all(0),
-                                    width: 80,
-                                    height: height,
-                                    decoration:BoxDecoration(
-                                      color: biruungu,
-                                      borderRadius: BorderRadius.circular(7)
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context){
+                                  return const TBmenurutUmurPage();
+                                }));
+                              },
+                              child: Card(
+                                color: Colors.white,
+                                elevation: 8, shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ), 
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.all(0),
+                                      width: 80,
+                                      height: height,
+                                      decoration:BoxDecoration(
+                                        color: biruungu,
+                                        borderRadius: BorderRadius.circular(7)
+                                      ),
+                                      child: Image.asset("assets/icons/height.png", scale: 1.3,),
                                     ),
-                                    child: Image.asset("assets/icons/height.png", scale: 1.3,),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("Tinggi\nBadan\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 12, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
-                                ],
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text("Tinggi\nBadan\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 12, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
+                                  ],
+                                ),
                               ),
                             ),
-                            Card(
-                              color: Colors.white,
-                              elevation: 8, shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ), 
-                              child: Row(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.all(0),
-                                    width: 80,
-                                    height: height,
-                                    decoration:BoxDecoration(
-                                      color: biruungu,
-                                      borderRadius: BorderRadius.circular(7)
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context){
+                                  return const BBmenurutTBPage();
+                                }));
+                              },
+                              child: Card(
+                                color: Colors.white,
+                                elevation: 8, shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ), 
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.all(0),
+                                      width: 80,
+                                      height: height,
+                                      decoration:BoxDecoration(
+                                        color: biruungu,
+                                        borderRadius: BorderRadius.circular(7)
+                                      ),
+                                      child: Image.asset("assets/icons/hwicon.png", scale: 1.3,),
                                     ),
-                                    child: Image.asset("assets/icons/hwicon.png", scale: 1.3,),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("Berat\nBadan\nmenurut\nTinggi Badan", style: inclusiveSans.copyWith(fontSize: 11.5, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
-                                ],
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text("Berat\nBadan\nmenurut\nTinggi Badan", style: inclusiveSans.copyWith(fontSize: 11.5, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
+                                  ],
+                                ),
                               ),
                             ),
-                            Card(
-                              color: Colors.white,
-                              elevation: 8, shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ), 
-                              child: Row(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.all(0),
-                                    width: 80,
-                                    height: height,
-                                    decoration:BoxDecoration(
-                                      color: biruungu,
-                                      borderRadius: BorderRadius.circular(7)
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context){
+                                  return const IMTmenurutUmurPage();
+                                }));
+                              },
+                              child: Card(
+                                color: Colors.white,
+                                elevation: 8, shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ), 
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.all(0),
+                                      width: 80,
+                                      height: height,
+                                      decoration:BoxDecoration(
+                                        color: biruungu,
+                                        borderRadius: BorderRadius.circular(7)
+                                      ),
+                                      child: Image.asset("assets/icons/massa.png", scale: 1.3,),
                                     ),
-                                    child: Image.asset("assets/icons/massa.png", scale: 1.3,),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("Indeks\nMassa Tubuh\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 11.5, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
-                                ],
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text("Indeks\nMassa Tubuh\nmenurut\nUmur", style: inclusiveSans.copyWith(fontSize: 11.5, fontWeight: FontWeight.w500,color: Colors.grey[700]),)
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -217,7 +266,12 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Blog Kegiatan", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w700),),
-                          TextButton(onPressed: (){}, child: Text("Lihat Semua",style: inclusiveSans.copyWith(fontSize: 13, color: biruungu, fontWeight: FontWeight.w700),))
+                          TextButton(
+                            onPressed: () {
+                              
+                            },
+                            child: Text("Lihat Semua", style: inclusiveSans.copyWith(fontSize: 13, color: biruungu, fontWeight: FontWeight.w700),)
+                          )
                         ],
                       ),
                       Container(
@@ -299,7 +353,7 @@ class _HomePageState extends State<HomePage> {
             Positioned(
               left: 20,
               right: 20,
-              top: height * 0.25 + 95,
+              top: 300,
               child: Container(
                 height: 160,
                 decoration: BoxDecoration(

@@ -26,6 +26,9 @@ List<Map<String, dynamic>> data = [
   },
   {
     "image":"assets/images/Banner4.png",
+  },
+  {
+    "image":"assets/images/Banner5.png",
   }
 ];
 

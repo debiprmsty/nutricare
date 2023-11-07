@@ -1,20 +1,25 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:nutricare/api/auth.dart';
+import 'package:nutricare/api/user.dart';
 import 'package:nutricare/auth/RegisterPage.dart';
 import 'package:nutricare/pages/Index.dart';
 import 'package:nutricare/theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginPagePetugas extends StatefulWidget {
+  const LoginPagePetugas({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginPagePetugas> createState() => _LoginPagePetugasState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPagePetugasState extends State<LoginPagePetugas> {
   final _formKey = GlobalKey<FormState>();
+  AuthController _authController = AuthController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  final UserController _userController = UserController();
   String _email = '', _password = '';
 
   bool isClick = false;
@@ -70,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     
-
     return Scaffold(
       body: Center(
         child: Container(
@@ -82,14 +86,14 @@ class _LoginPageState extends State<LoginPage> {
                 width: width,
                 height: height,
                 alignment: Alignment.topCenter,
-                decoration: BoxDecoration(             
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(bottomLeft: Radius.circular(35), bottomRight: Radius.circular(35))
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                       width: width,
+                      width: width,
                         height: 500,
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(    
@@ -149,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Center(child: Text("Welcome!", style: inclusiveSans.copyWith(fontSize: 27, color: biruungu, fontWeight: FontWeight.w600), textAlign: TextAlign.center,)),
+                        Center(child: Text("Welcome Petugas!", style: inclusiveSans.copyWith(fontSize: 27, color: biruungu, fontWeight: FontWeight.w600), textAlign: TextAlign.center,)),
                         Center(child: Text("Sign in to continue", style: inclusiveSans.copyWith(fontSize: 17, color: Colors.grey[400], fontWeight: FontWeight.w600), textAlign: TextAlign.center,)),
                         const SizedBox(
                           height: 50,
@@ -253,23 +257,63 @@ class _LoginPageState extends State<LoginPage> {
                             height: 43,
                             child: FilledButton(
                               onPressed: _isFormValid
-                                  ? () {
-                                     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+                                  ? () async {
+                                    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
                                             content: Text('Email dan password harus diisi.'),
                                           ),
                                         );
                                       } else {
+                                         _formKey.currentState!.save();
+
+                                        String email = _emailController.text;
+                                        String password = _passwordController.text;
                                         // Lakukan tindakan saat LOGIN berhasil
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text('LOGIN berhasil.'),
-                                          ),
-                                        );
-                                        Navigator.push(context, MaterialPageRoute(builder: (context){
-                                          return const IndexPage();
-                                        }));
+                                        await _authController
+                                        .login(email, password)
+                                        .then((value) async {
+                                          if (value['success'] == false) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Email atau Password salah'),
+                                                duration: Duration(
+                                                    seconds: 2), // Durasi notifikasi
+                                              ),
+                                            );
+                                          } else if (value['success'] == true) {
+                                            final SharedPreferences prefs =
+                                                await SharedPreferences.getInstance();
+                                            prefs.setString(
+                                                'token',
+                                                value[
+                                                    'token']); 
+                                                    
+                                            _userController.fetchUser().then((value) => {
+                                              if(value != null) {
+                                                if(value['role'] == 'petugas') {
+                                                  Navigator.pushReplacement(context,
+                                                      MaterialPageRoute(builder: (context) {
+                                                    return IndexPage();
+                                                  }))
+                                                }else if(value['role'] == 'viewer') {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                          'Maaf sudah terdaftar menjadi viewer, silahkan masuk sebagai viewer'),
+                                                      duration: Duration(
+                                                          seconds: 2), // Durasi notifikasi
+                                                    ),
+                                                  )
+                                                }
+                                              }
+                                            });// Simpan token ke dalam SharedPreferences
+                                            
+                                          }
+                                        });
                                       }
                                     }
                                   : null, // Jika formulir tidak valid, maka `onPressed` harus null
