@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nutricare/api/balita.dart';
+import 'package:nutricare/api/ortu.dart';
+import 'package:nutricare/models/OrangTua.dart';
 import 'package:nutricare/theme.dart';
 
 class UpdateBalitaPage extends StatefulWidget {
-  const UpdateBalitaPage({super.key});
+  final String id;
+  const UpdateBalitaPage({super.key, required this.id});
 
   @override
   State<UpdateBalitaPage> createState() => _UpdateBalitaPageState();
@@ -17,6 +21,13 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
   TextEditingController _tanggalController = TextEditingController();
   TextEditingController _orangtuaController = TextEditingController();
   TextEditingController _umurController = TextEditingController();
+  TextEditingController _idKKController = TextEditingController();
+  TextEditingController _idOrtuController = TextEditingController();
+  TextEditingController _alamatController = TextEditingController();
+
+  OrtuController _ortuController = OrtuController();
+  BalitaController _balitaController = BalitaController();
+  
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -44,6 +55,26 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
   }
 
   String selectedValue = '';
+
+  @override
+  void initState(){
+    super.initState();
+    _balitaController.fetchBalitaId(widget.id).then((value) => {
+      if(value != null) {
+        setState(() {
+          _nikBalitaController.text = value['nik_balita'];
+          _namaBalitaController.text = value['nama'];
+          _tanggalController.text = value['tanggal_lahir'];
+          _umurController.text = value['umur'];
+          selectedValue = value['jenis_kelamin'];
+          _alamatController.text = value['ortu']['nama_posko'];
+          _idKKController.text = value['keluarga']['id'];
+          _idOrtuController.text = value['ortu']['id'];
+        })
+      }
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -315,6 +346,162 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                             ],
                           ),
                         ),
+                        Visibility(
+                          visible: false,
+                          child: Text("Id KK", style: inclusiveSans.copyWith(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),)
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: const SizedBox(
+                            height: 8,
+                          ),
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: TextFormField(
+                            style: poppins,
+                            controller: _idKKController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan ID KK',
+                              hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 15),
+                              focusColor: Colors.black,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 12),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika tidak dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                            ),
+                          ),
+                        ),
+                         Visibility(
+                          visible: false,
+                          child: Text("Alamat", style: inclusiveSans.copyWith(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),)
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: const SizedBox(
+                            height: 8,
+                          ),
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: TextFormField(
+                            style: poppins,
+                            controller: _alamatController,
+                            keyboardType: TextInputType.text,
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan ID KK',
+                              hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 15),
+                              focusColor: Colors.black,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 12),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika tidak dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: const SizedBox(
+                            height: 15,
+                          ),
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: Text("Id Ortu", style: inclusiveSans.copyWith(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),)
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: const SizedBox(
+                            height: 8,
+                          ),
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: TextFormField(
+                            style: poppins,
+                            controller: _idOrtuController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan ID Ortu',
+                              hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 15),
+                              focusColor: Colors.black,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 12),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika tidak dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: const SizedBox(
+                            height: 15,
+                          ),
+                        ),
                         Text("Pilih Orang Tua", style: inclusiveSans.copyWith(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),),
                         const SizedBox(
                           height: 8,
@@ -443,9 +630,40 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                     ),
                     backgroundColor: MaterialStatePropertyAll(biruungu)
                   ),
-                  onPressed: (){
+                  onPressed: () async {
+                    final nik_balita = _nikBalitaController.text;
+                    final nama = _namaBalitaController.text;
+                    final tanggal_lahir = _tanggalController.text;
+                    final umur = _umurController.text;
+                    final nama_dusun = _alamatController.text;
+                    final idKK = _idKKController.text;
+                    final idOrtu = _idOrtuController.text;
+                    final jenis_kelamin = selectedValue;
+
+                    final data = {
+                      "nik_balita" : nik_balita,
+                      "nama" : nama,
+                      "tanggal_lahir" : tanggal_lahir,
+                      "umur" : umur,
+                      "nama_dusun" : nama_dusun,
+                      "idKK" : idKK,
+                      "idOrtu" : idOrtu,
+                      "jenis_kelamin" : jenis_kelamin,
+                    };
                     
-                  }, child: Text("UPDATE DATA", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.white),)),
+                    await _balitaController.addBalita(nik_balita, nama, tanggal_lahir, umur, jenis_kelamin, nama_dusun, idKK, idOrtu).then((value) => {
+                      if(value['success'] == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Data berhasil diUpdate'),
+                              duration: Duration(seconds: 2), // Durasi notifikasi
+                            ),
+                          ),
+                          Navigator.pop(context)
+                      }
+                    });
+                    
+                  }, child: Text("Update DATA", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.white),)),
               ),
             ],
           ),
@@ -455,9 +673,11 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
     );
+   
   }
 
   Future _displayBottomSheet(BuildContext context) async{
+
       await showModalBottomSheet(
         context: context, 
         shape: RoundedRectangleBorder(
@@ -543,50 +763,75 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                   Container(
                     height: 280,
                     width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: 20,
-                      itemBuilder: (BuildContext context,index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    constraints: BoxConstraints(maxWidth:260,),
-                                    child: SingleChildScrollView(scrollDirection: Axis.horizontal ,child: Text("${index + 1}.  Lanang Darma - Debi awddadawdwadawdwadwdw00000000000000", style: inclusiveSans.copyWith(fontSize: 14,color: Colors.grey[600],fontWeight: FontWeight.w600),textAlign: TextAlign.start,))),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                      backgroundColor: MaterialStatePropertyAll(birulaut),
-                                      padding: MaterialStatePropertyAll(const EdgeInsets.symmetric(vertical: 8)),
-                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10.0), // Sesuaikan dengan nilai yang diinginkan
+                    child: FutureBuilder(
+                      future: _ortuController.fetchOrtu(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasData){
+                          final orangtuas = snapshot.data;
+                          return ListView.builder(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            itemCount: orangtuas.length,
+                            itemBuilder: (BuildContext context,index) {
+                              final orangtua = orangtuas[index];
+
+                              final idOrtu = orangtua['id'];
+                              final namaBapak = orangtua['nama_bapak'];
+                              final namaIbu = orangtua['nama_ibu'];
+                              final idKK = orangtua['id_kk'];
+                              final alamat = orangtua['alamat'];
+                            
+                              
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 6),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          constraints: BoxConstraints(maxWidth:260,),
+                                          child: SingleChildScrollView(scrollDirection: Axis.horizontal ,child: Text("${index + 1}.  $namaBapak - $namaIbu", style: inclusiveSans.copyWith(fontSize: 14,color: Colors.grey[600],fontWeight: FontWeight.w600),textAlign: TextAlign.start,))),
+                                        ElevatedButton(
+                                          style: ButtonStyle(
+                                            backgroundColor: MaterialStatePropertyAll(birulaut),
+                                            padding: MaterialStatePropertyAll(const EdgeInsets.symmetric(vertical: 8)),
+                                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10.0), // Sesuaikan dengan nilai yang diinginkan
+                                              ),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _orangtuaController.text = "$namaBapak - $namaIbu";
+                                              _idOrtuController.text = "$idOrtu";
+                                              _idKKController.text = "$idKK";
+                                              _alamatController.text = "$alamat";
+                                            });
+                                            print(_alamatController.text);
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text("Pilih", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.white),)
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                    onPressed: () {
-                                      String data = "Lanang Debi Sayang";
-                                      setState(() {
-                                        _orangtuaController.text = data;
-                                        print(_orangtuaController.text);
-                                      });
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text("Pilih", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.white),)
-                                  ),
-                                ],
-                              ),
-                              Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Colors.grey[400],
-                              )
-                            ],
-                          ),
-                        );
+                                    Divider(
+                                      height: 1,
+                                      thickness: 1,
+                                      color: Colors.grey[400],
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                          );
+                        } else {
+                          return Center(
+                            child: Text("Tidak ada data"),
+                          );
+                        }
                       }
                     )
                   )
@@ -596,6 +841,17 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
           ),
         )
       );
-     
   }
 }
+//  final orangtuas = snapshot.data;
+
+// for(var i = 1; i < orangtuas=13; i++) {
+//   print("saya adalah data ke ${orangtuas[i+ 1]}")
+// }
+
+// // output
+// saya  adalah data ke 2
+// saya  adalah data ke 2
+// saya  adalah data ke 3
+// saya  adalah data ke 4
+// saya  adalah data ke 12

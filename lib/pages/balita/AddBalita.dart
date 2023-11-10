@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nutricare/api/balita.dart';
 import 'package:nutricare/api/ortu.dart';
 import 'package:nutricare/models/OrangTua.dart';
 import 'package:nutricare/theme.dart';
@@ -21,8 +22,11 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
   TextEditingController _umurController = TextEditingController();
   TextEditingController _idKKController = TextEditingController();
   TextEditingController _idOrtuController = TextEditingController();
+  TextEditingController _alamatController = TextEditingController();
 
   OrtuController _ortuController = OrtuController();
+  BalitaController _balitaController = BalitaController();
+  
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -370,6 +374,54 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
                             ),
                           ),
                         ),
+                         Visibility(
+                          visible: false,
+                          child: Text("Alamat", style: inclusiveSans.copyWith(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),)
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: const SizedBox(
+                            height: 8,
+                          ),
+                        ),
+                        Visibility(
+                          visible: false,
+                          child: TextFormField(
+                            style: poppins,
+                            controller: _alamatController,
+                            keyboardType: TextInputType.text,
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan ID KK',
+                              hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 15),
+                              focusColor: Colors.black,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 12),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika tidak dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                            ),
+                          ),
+                        ),
                         Visibility(
                           visible: false,
                           child: const SizedBox(
@@ -558,7 +610,38 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
                     ),
                     backgroundColor: MaterialStatePropertyAll(biruungu)
                   ),
-                  onPressed: (){
+                  onPressed: () async {
+                    final nik_balita = _nikBalitaController.text;
+                    final nama = _namaBalitaController.text;
+                    final tanggal_lahir = _tanggalController.text;
+                    final umur = _umurController.text;
+                    final nama_dusun = _alamatController.text;
+                    final idKK = _idKKController.text;
+                    final idOrtu = _idOrtuController.text;
+                    final jenis_kelamin = selectedValue;
+
+                    final data = {
+                      "nik_balita" : nik_balita,
+                      "nama" : nama,
+                      "tanggal_lahir" : tanggal_lahir,
+                      "umur" : umur,
+                      "nama_dusun" : nama_dusun,
+                      "idKK" : idKK,
+                      "idOrtu" : idOrtu,
+                      "jenis_kelamin" : jenis_kelamin,
+                    };
+                    
+                    await _balitaController.addBalita(nik_balita, nama, tanggal_lahir, umur, jenis_kelamin, nama_dusun, idKK, idOrtu).then((value) => {
+                      if(value['success'] == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Data berhasil ditambah'),
+                              duration: Duration(seconds: 2), // Durasi notifikasi
+                            ),
+                          ),
+                          Navigator.pop(context)
+                      }
+                    });
                     
                   }, child: Text("TAMBAH DATA", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.white),)),
               ),
@@ -677,7 +760,9 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
                               final namaBapak = orangtua['nama_bapak'];
                               final namaIbu = orangtua['nama_ibu'];
                               final idKK = orangtua['id_kk'];
-                              print(orangtua);
+                              final alamat = orangtua['alamat'];
+                            
+                              
                               return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 6),
                                 child: Column(
@@ -703,7 +788,9 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
                                               _orangtuaController.text = "$namaBapak - $namaIbu";
                                               _idOrtuController.text = "$idOrtu";
                                               _idKKController.text = "$idKK";
+                                              _alamatController.text = "$alamat";
                                             });
+                                            print(_alamatController.text);
                                             Navigator.of(context).pop();
                                           },
                                           child: Text("Pilih", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.white),)

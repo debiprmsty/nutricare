@@ -104,27 +104,7 @@ class _LoginPageOwnerState extends State<LoginPageOwner> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 67),
                         child: Image.asset("assets/images/logo.png", width: 250, height: 150,),
-                      )),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 30),
-                      child: Text.rich(
-                        TextSpan(
-                          text: "Don't have an account?",
-                          style: inclusiveSans.copyWith(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w500),
-                          children: [
-                            TextSpan(
-                              text: ' Sign Up',
-                              style: inclusiveSans.copyWith(fontWeight: FontWeight.bold, color: biruungu, fontSize: 17,),
-                              recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context){
-                                  return const RegisterPageOwner();
-                                }));
-                              },
-                            )
-                          ]
-                        )
-                      ),
+                      )
                     ),
                   ],
                 ),

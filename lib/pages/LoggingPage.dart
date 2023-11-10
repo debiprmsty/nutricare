@@ -458,7 +458,7 @@ class _LoggingPageState extends State<LoggingPage> {
                                                   GestureDetector(
                                                     onTap: () {
                                                       Navigator.push(context, MaterialPageRoute(builder: (context){
-                                                        return const UpdateBalitaPage();
+                                                        return UpdateBalitaPage(id: balita['id'].toString(),);
                                                       }));
                                                     },
                                                     child: Icon(Icons.edit_square,color: Colors.amber[600],)
@@ -945,212 +945,236 @@ class _LoggingPageState extends State<LoggingPage> {
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.78,
         padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text("Detail Balita", style: inclusiveSans.copyWith(fontSize: 23, fontWeight: FontWeight.bold, color: biruungu),),
-                const SizedBox(
-                  width: 85,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text("Detail Balita", style: inclusiveSans.copyWith(fontSize: 23, fontWeight: FontWeight.bold, color: biruungu),),
+                  const SizedBox(
+                    width: 85,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Icon(Icons.close_rounded, color: biruungu,)
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Icon(Icons.close_rounded, color: biruungu,)
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Container(
-              width: width,
-              height: 59,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10)
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Nomor KK", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                    Text("${balita['keluarga']['nik_keluarga'] ?? 0}", style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            Container(
-              width: width,
-              height: 59,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10)
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Nama Bapak", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                    Text(balita['ortu']['nama_bapak'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Nomor KK", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      Text("${balita['keluarga']['nik_keluarga'] ?? 0}", style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            Container(
-              width: width,
-              height: 59,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10)
+              const SizedBox(
+                height: 12,
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Nama Ibu", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                    Text(balita['ortu']['nama_ibu'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
-                  ],
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Nama Bapak", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      Text(balita['ortu']['nama_bapak'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            Container(
-              width: width,
-              height: 59,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10)
+              const SizedBox(
+                height: 12,
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("NIK Balita", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                    Text("${balita['nik_balita']}", style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
-                  ],
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Nama Ibu", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      Text(balita['ortu']['nama_ibu'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            Container(
-              width: width,
-              height: 59,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10)
+              const SizedBox(
+                height: 12,
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Nama Balita", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                    Text(balita['nama'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
-                  ],
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("NIK Balita", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      Text("${balita['nik_balita']}", style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Container(
-              width: width,
-              height: 59,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10)
+              const SizedBox(
+                height: 12,
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Tanggal Lahir Balita", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                    Text("${balita['tanggal_lahir']}", style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
-                  ],
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Nama Balita", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      Text(balita['nama'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            Container(
-              width: width,
-              height: 59,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10)
+              const SizedBox(
+                height: 15,
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Umur", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                    RichText(
-                      text: TextSpan(
-                        text: "${balita['umur']}",
-                        style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
-                        children: [
-                          TextSpan(
-                            text: " Bulan",
-                            style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)
-                          )
-                        ]
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Alamat", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      Text(balita['ortu']['alamat'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Tanggal Lahir Balita", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      Text("${balita['tanggal_lahir']}", style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Umur", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      RichText(
+                        text: TextSpan(
+                          text: "${balita['umur']}",
+                          style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                          children: [
+                            TextSpan(
+                              text: " Bulan",
+                              style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)
+                            )
+                          ]
+                        )
                       )
-                    )
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            Container(
-              width: width,
-              height: 59,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10)
+              const SizedBox(
+                height: 12,
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Jenis Kelamin", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                    Text(balita['jenis_kelamin'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
-                  ],
+              Container(
+                width: width,
+                height: 59,
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 8, top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Jenis Kelamin", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
+                      Text(balita['jenis_kelamin'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         )
       )
     );

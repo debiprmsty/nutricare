@@ -110,12 +110,12 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SingleChildScrollView(
         child: Container(
           width: width,
-          height: height * 1.5,
+          height: height * 1.5 - 110,
           child: Stack(
             children: [
               Container(
                 width: width,
-                height: height * 3,
+                height: height * 2,
                 alignment: Alignment.topCenter,
                 decoration: BoxDecoration(
                   color: Colors.white,             
@@ -126,7 +126,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     Container(
                       width: width,
-                      height: 500,
+                      height: 600,
                       alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: biruungu,             
@@ -489,7 +489,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       prefixIcon: Container(
                                         margin: const EdgeInsets.only(right: 10),
                                         child: Icon(Icons.holiday_village_outlined,color: biruungu,)),
-                                      hintText: "Nama Dusun",
+                                      hintText: "Nama Posyandu/Puskesmas",
                                       hintStyle: inclusiveSans.copyWith(color: Colors.grey[400]),
                                       isDense: false,
                                       isCollapsed: false,

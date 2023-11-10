@@ -37,7 +37,7 @@ class BalitaController {
   Future<dynamic> fetchBalitaId(String id) async {
     final token = await _getToken();
     if (token != null) {
-      final url = "$baseUrl" + 'balita/detail/${id}';
+      final url = "$baseUrl" + 'balita/detail/$id';
       Response response = await dio.get(
         url,
         options: Options(
@@ -60,7 +60,7 @@ class BalitaController {
       return null;
     }
 
-  Future<dynamic> addBalita(String nik_keluarga, String nik_bapak, String nik_ibu, String nama_bapak,String nama_ibu,String nama,String tanggal_lahir,String umur,String jenis_kelamin,String alamat) async {
+  Future<dynamic> addBalita(String nik_balita, String nama,String tanggal_lahir,String umur,String jenis_kelamin,String alamat,String id_kk,String id_ortu)async {
     final token = await _getToken();
     
     if(token != null) {
@@ -69,12 +69,10 @@ class BalitaController {
         data: {
           'nama': nama,
           'tanggal_lahir': tanggal_lahir,
+          'nik_balita' : nik_balita,
           'nama_dusun' : alamat,
-          'nama_ibu' : nama_ibu,
-          'nama_bapak' : nama_bapak,
-          'nik_keluarga' : nik_keluarga,
-          'nik_bapak' : nik_bapak,
-          'nik_ibu' : nik_ibu,
+          'id_ortu' : id_ortu,
+          'id_kk' : id_kk,
           'jenis_kelamin' : jenis_kelamin,
         },
         options: Options(
@@ -85,7 +83,7 @@ class BalitaController {
       print(response.data); // Tambahkan baris ini untuk melihat respons
       print(response.statusCode);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         return response.data;
       } 
     }
