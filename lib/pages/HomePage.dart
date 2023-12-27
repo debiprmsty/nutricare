@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nutricare/api/totalHome.dart';
 import 'package:nutricare/api/user.dart';
 import 'package:nutricare/components/Slider.dart';
 import 'package:nutricare/models/User.dart';
@@ -39,15 +40,19 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final UserController _userController = UserController();
+  final TotalHomeController _totalController = TotalHomeController();
   late User _activeUser = User(id: 0, fullname: "", role: "", image: "");
+  String _namaposko = '';
 
   @override
   void initState() {
     super.initState();
     _userController.fetchUser().then((value) => {
+      print(value),
       if (value != null) {
         setState(() {
           _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image']);
+          _namaposko = value['nama_dusun'];
         })
       }
     });
@@ -57,7 +62,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-
+    print(_namaposko);
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -81,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               CircleAvatar(
                                 radius: 28,
-                                backgroundImage: _activeUser.image != "" ? NetworkImage("https://testchairish.000webhostapp.com/api/user-image/${_activeUser.image}",) : NetworkImage("https://afpertise.com/media/2020/09/Member-1.jpg",) ,
+                                backgroundImage: _activeUser.image != "" ? NetworkImage("https://testchairish.000webhostapp.com/api/user-image/${_activeUser.image}",) : NetworkImage("https://th.bing.com/th/id/OIP.39IRe__qOkrugBUU_FWeyQAAAA?w=327&h=327&rs=1&pid=ImgDetMain",) ,
                               ),
                               const SizedBox(
                                 width: 10,
@@ -368,49 +373,107 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Data Orang Tua", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text("100", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
-                          const SizedBox(
-                            height: 14,
-                          ),
-                          Text("Data Balita", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text("100", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Data Balita Perempuan", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text("50", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
-                          const SizedBox(
-                            height: 14,
-                          ),
-                          Text("Data Balita Laki-Laki", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text("50", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
-                        ],
-                      )
-                    ],
-                  ),
+                child: FutureBuilder(
+                  future: _totalController.fetchTotalHome(_namaposko),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(color: biruungu,),
+                      );
+                    } else if (snapshot.hasData) {
+                      final total = snapshot.data['data'];
+                      print(total);
+                      return Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Data Orang Tua", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text("${total['orangTua']}", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 14,
+                                ),
+                                Text("Data Balita", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text("${total['balita']}", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Data Balita Perempuan", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text("${total['perempuan']}", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 14,
+                                ),
+                                Text("Data Balita Laki-Laki", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text("${total['laki_laki']}", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Data Orang Tua", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text("0", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 14,
+                                ),
+                                Text("Data Balita", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text("0", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Data Balita Perempuan", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text("0", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 14,
+                                ),
+                                Text("Data Balita Laki-Laki", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text("0", style: league.copyWith(fontSize: 35, color: biruungu, fontWeight: FontWeight.bold),),
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    }
+                  }, 
                 ),
               )
             ),

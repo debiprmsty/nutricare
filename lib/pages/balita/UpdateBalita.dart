@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nutricare/api/balita.dart';
 import 'package:nutricare/api/ortu.dart';
+import 'package:nutricare/api/user.dart';
 import 'package:nutricare/models/OrangTua.dart';
+import 'package:nutricare/models/User.dart';
 import 'package:nutricare/theme.dart';
 
 class UpdateBalitaPage extends StatefulWidget {
@@ -24,9 +26,12 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
   TextEditingController _idKKController = TextEditingController();
   TextEditingController _idOrtuController = TextEditingController();
   TextEditingController _alamatController = TextEditingController();
+  TextEditingController _selectedDateC = TextEditingController();
 
   OrtuController _ortuController = OrtuController();
   BalitaController _balitaController = BalitaController();
+  final UserController _userController = UserController();
+  late User _activeUser = User(id: 0, fullname: "", role: "", image: "");
   
 
   Future<void> _selectDate(BuildContext context) async {
@@ -55,32 +60,58 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
   }
 
   String selectedValue = '';
+  String isSelectedDate = '';
 
   @override
-  void initState(){
-    super.initState();
-    _balitaController.fetchBalitaId(widget.id).then((value) => {
-      if(value != null) {
+  void initState() {
+  super.initState();
+
+  _userController.fetchUser().then((value) => {
+      print(value),
+      if (value != null) {
         setState(() {
-          _nikBalitaController.text = value['nik_balita'];
-          _namaBalitaController.text = value['nama'];
-          _tanggalController.text = value['tanggal_lahir'];
-          _umurController.text = value['umur'];
-          selectedValue = value['jenis_kelamin'];
-          _alamatController.text = value['ortu']['nama_posko'];
-          _idKKController.text = value['keluarga']['id'];
-          _idOrtuController.text = value['ortu']['id'];
+          _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image'],nama_dusun: value['nama_dusun'],);
         })
       }
     });
-  }
+
+  // Fetch data from server and set the controller values
+  _balitaController.fetchBalitaId(widget.id).then((value) {
+    print(value);
+    if (value != null) {
+      setState(() {
+        _nikBalitaController.text = value['nik_balita'].toString();
+        _namaBalitaController.text = value['nama'];
+
+        // Filter out non-numeric characters and set the date to _tanggalController
+        String cleanedDate = value['tanggal_lahir'].replaceAll(RegExp(r'[^0-9]'), '');
+        _tanggalController.text = DateFormat('yyyy-MM-dd').format(
+          DateTime.parse(cleanedDate),
+        );
+
+        DateTime birthDate = DateTime.parse(cleanedDate);
+        DateTime today = DateTime.now();
+        int diffMonths = (today.year - birthDate.year) * 12 + today.month - birthDate.month;
+        _umurController.text = diffMonths.toString();
+        selectedValue = value['jenis_kelamin'].toString();
+        String ortu =  "${value['ortu']['nama_bapak']} - ${value['ortu']['nama_ibu']}";
+        _orangtuaController.text = ortu;
+        _alamatController.text = value['ortu']['alamat'];
+        _idKKController.text = value['keluarga']['id'].toString();
+        _idOrtuController.text = value['ortu']['id'].toString();
+      });
+    }
+  });
+}
+
+
 
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-
+    print(widget.id);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.grey[200],
@@ -226,9 +257,7 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                           await _selectDate(context);
                           calculateAge();
                         },
-                        controller: TextEditingController(
-                          text: selectedDate != null ? DateFormat('yyyy-MM-dd').format(selectedDate!) : 'Pilih tanggal lahir Balita',
-                        ),
+                        controller: _tanggalController,
                         decoration: InputDecoration(
                             hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 15),
                             focusColor: Colors.black,
@@ -318,9 +347,9 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                                   contentPadding: const EdgeInsets.only(left: 0),
                                   dense: true,
                                   title: Text('Laki-Laki', style: inclusiveSans.copyWith(fontSize: 15),),
-                                  value: 'Laki-Laki',
+                                  value: 'Laki-laki',
                                   groupValue: selectedValue,
-                                  onChanged: (value) {
+                                  onChanged: (String? value) {
                                     setState(() {
                                       selectedValue = value!;
                                     });
@@ -336,7 +365,7 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                                   title: Text('Perempuan', style: inclusiveSans.copyWith(fontSize: 15),),
                                   value: 'Perempuan',
                                   groupValue: selectedValue,
-                                  onChanged: (value) {
+                                  onChanged: (String? value) {
                                     setState(() {
                                       selectedValue = value!;
                                     });
@@ -631,6 +660,7 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                     backgroundColor: MaterialStatePropertyAll(biruungu)
                   ),
                   onPressed: () async {
+                    final idBalita = widget.id.toString();
                     final nik_balita = _nikBalitaController.text;
                     final nama = _namaBalitaController.text;
                     final tanggal_lahir = _tanggalController.text;
@@ -639,6 +669,7 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                     final idKK = _idKKController.text;
                     final idOrtu = _idOrtuController.text;
                     final jenis_kelamin = selectedValue;
+                    final nama_posko = _activeUser.nama_dusun;
 
                     final data = {
                       "nik_balita" : nik_balita,
@@ -649,9 +680,10 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                       "idKK" : idKK,
                       "idOrtu" : idOrtu,
                       "jenis_kelamin" : jenis_kelamin,
+                      "nama_posko": nama_posko,
                     };
                     
-                    await _balitaController.addBalita(nik_balita, nama, tanggal_lahir, umur, jenis_kelamin, nama_dusun, idKK, idOrtu).then((value) => {
+                    await _balitaController.updateBalita(nik_balita, nama, tanggal_lahir, umur, jenis_kelamin, nama_dusun, idKK, idOrtu,idBalita,nama_posko.toString()).then((value) => {
                       if(value['success'] == true) {
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -663,7 +695,7 @@ class _UpdateBalitaPageState extends State<UpdateBalitaPage> {
                       }
                     });
                     
-                  }, child: Text("Update DATA", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.white),)),
+                  }, child: Text("UPDATE DATA", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.white),)),
               ),
             ],
           ),

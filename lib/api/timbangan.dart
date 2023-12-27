@@ -1,42 +1,41 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:nutricare/models/OrangTua.dart';
+import 'package:nutricare/models/Timbangan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class OrtuController {
+class TimbanganController{
   final dio = Dio();
   final baseUrl = "https://testchairish.000webhostapp.com/api/";
 
-   Future<String?> _getToken() async {
+  Future<String?> _getToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }
 
-
-  Future<dynamic> fetchOrtu() async {
+  Future<dynamic> fetchTimbangan() async {
     final token = await _getToken();
-      if(token != null) {
-        final url = "$baseUrl" + 'ortu';
-        Response response = await dio.get(url, options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),);
+    if(token != null) {
+      final url = "$baseUrl" + 'penimbangan';
+      Response response = await dio.get(url, options: Options(
+        headers: {'Authorization': 'Bearer $token'},
+      ),);
 
-        if (response.statusCode == 200) {
-            final data = response.data;
-            if(data != null) {
-              return data['data'];
-            }
-        } else {
-          print('Gagal mengambil data dari API');
-        }
+      if (response.statusCode == 200) {
+          final data = response.data;
+          if(data != null) {
+            return data['data'];
+          }
+      } else {
+        print('Gagal mengambil data dari API');
       }
     }
+  }
 
-    Future<OrangTua?> fetchOrtuId(String id) async {
+  Future<dynamic> fetchTimbanganId(String id) async {
     final token = await _getToken();
     if (token != null) {
-      final url = "$baseUrl" + 'ortu/search/${id}';
+      final url = "$baseUrl" + 'penimbangan/search/$id';
       Response response = await dio.get(
         url,
         options: Options(
@@ -45,14 +44,10 @@ class OrtuController {
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = response.data['data'];
         if (data != null) {
 
-          // Membuat objek OrangTua dari data JSON
-          OrangTua orangTua = OrangTua.fromJson(data['data']);
-
-          // Mengembalikan objek OrangTua
-          return orangTua;
+          return data;
         }
       } else {
         print('Gagal mengambil data dari API');
@@ -65,20 +60,18 @@ class OrtuController {
 
 
 
-  Future<dynamic> addOrtu(String nik_keluarga, String nik_bapak, String nik_ibu, String nama_bapak, String nama_ibu, String alamat, String nama_posko) async {
+  Future<dynamic> addTimbangan(String id_balita, String tanggal_timbangan, String berat_badan, String tinggi_badan,String nama_posko) async {
     final token = await _getToken();
     
     if(token != null) {
       Response response = await dio.post(
-        '$baseUrl' + 'ortu',
+        '$baseUrl' + 'penimbangan',
         data: {
-          'alamat' : alamat,
-          'nama_ibu' : nama_ibu,
-          'nama_bapak' : nama_bapak,
-          'nik_keluarga' : nik_keluarga,
-          'nik_bapak' : nik_bapak,
-          'nik_ibu' : nik_ibu,
-          'nama_posko' : nama_posko,
+          'id_balita' : id_balita,
+          'tanggal_timbangan' : tanggal_timbangan,
+          'berat_badan' : berat_badan,
+          'tinggi_badan' : tinggi_badan,
+          "nama_posko" : nama_posko,
         },
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
@@ -93,21 +86,18 @@ class OrtuController {
 
   }
 
-  Future<dynamic> updateOrtu(String id, String id_kk, String nik_keluarga, String nik_bapak, String nik_ibu, String nama_bapak, String nama_ibu, String alamat, String nama_posko) async {
+  Future<dynamic> updateTimbangan(String id, String id_balita, String tanggal_timbangan, String berat_badan, String tinggi_badan,String nama_posko) async {
     final token = await _getToken();
     
     if(token != null) {
       Response response = await dio.post(
-        '$baseUrl' + 'ortu/$id',
+        '$baseUrl' + 'penimbangan/$id',
         data: {
-          'alamat' : alamat,
-          'nama_ibu' : nama_ibu,
-          'nama_bapak' : nama_bapak,
-          'id_kk' : id_kk,
-          'nik_kk' : nik_keluarga,
-          'nik_bapak' : nik_bapak,
-          'nik_ibu' : nik_ibu,
-          'nama_posko' : nama_posko
+          'id_balita' : id_balita,
+          'tanggal_timbangan' : tanggal_timbangan,
+          'berat_badan' : berat_badan,
+          'tinggi_badan' : tinggi_badan,
+          'nama_posko' : nama_posko,
         },
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
@@ -122,10 +112,10 @@ class OrtuController {
 
   }
 
-  Future<dynamic> deleteOrtu(String id) async {
+  Future<dynamic> deleteTimbangan(String id) async {
     final token = await _getToken();
     if(token != null) {
-      final url = "$baseUrl" + 'ortu/delete/$id';
+      final url = "$baseUrl" + 'penimbangan/delete/$id';
       Response response = await dio.get(url, options: Options(
         headers: {'Authorization': 'Bearer $token'},
       ),);
@@ -141,5 +131,4 @@ class OrtuController {
       }
     }
   }
-
 }

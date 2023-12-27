@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nutricare/api/balita.dart';
+import 'package:nutricare/api/timbangan.dart';
+import 'package:nutricare/api/user.dart';
+import 'package:nutricare/models/User.dart';
 import 'package:nutricare/theme.dart';
 
 class AddPenimbanganPage extends StatefulWidget {
-  const AddPenimbanganPage({super.key});
+  final void Function(String) searchTimbangan;
+  const AddPenimbanganPage({super.key, required this.searchTimbangan});
 
   @override
   State<AddPenimbanganPage> createState() => _AddPenimbanganPageState();
@@ -14,8 +19,14 @@ class _AddPenimbanganPageState extends State<AddPenimbanganPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _namaBalitaController = TextEditingController();
   TextEditingController _tanggalController = TextEditingController();
+  BalitaController _balitaController = BalitaController();
+  TimbanganController _timbanganController = TimbanganController();
   TextEditingController _bbController = TextEditingController();
   TextEditingController _tbController = TextEditingController();
+  TextEditingController _idBalitaController = TextEditingController();
+  UserController _activeController = UserController();
+  final UserController _userController = UserController();
+  late User _activeUser = User(id: 0, fullname: "", role: "", image: "");
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -35,7 +46,21 @@ class _AddPenimbanganPageState extends State<AddPenimbanganPage> {
     
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _userController.fetchUser().then((value) => {
+      print(value),
+      if (value != null) {
+        setState(() {
+          _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image'],nama_dusun: value['nama_dusun'],);
+        })
+      }
+    });
+  }
+
   String selectedValue = '';
+
 
   @override
   Widget build(BuildContext context) {
@@ -291,6 +316,44 @@ class _AddPenimbanganPageState extends State<AddPenimbanganPage> {
                               ),
                           ),
                         ),
+                        Visibility(
+                          visible: false,
+                          child: TextFormField(
+                            style: poppins,
+                            controller: _idBalitaController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan ID KK',
+                              hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 15),
+                              focusColor: Colors.black,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 12),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: biruungu,
+                                    width: 2 // Warna border ketika tidak dalam keadaan fokus
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -348,8 +411,35 @@ class _AddPenimbanganPageState extends State<AddPenimbanganPage> {
                     ),
                     backgroundColor: MaterialStatePropertyAll(biruungu)
                   ),
-                  onPressed: (){
+                  onPressed: () async{
+                    final id_balita = _idBalitaController.text;
+                    final tanggal_timbangan = _tanggalController.text;
+                    final berat_badan = _bbController.text;
+                    final tinggi_badan = _tbController.text;
+                    final String nama_posko = _activeUser.nama_dusun.toString();
+
+                    final data = {
+                      "id_balita" :id_balita,
+                      "tanggal_timbangan" : tanggal_timbangan,
+                      "berat_badan" : berat_badan,
+                      "tinggi_badan" : tinggi_badan,
+                      "nama_posko" : nama_posko,
+                    };
                     
+                    await _timbanganController.addTimbangan(id_balita, tanggal_timbangan, berat_badan, tinggi_badan,nama_posko).then((value) => {
+                      if(value != null) {
+                        if(value['success'] == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Data berhasil ditambah'),
+                              duration: Duration(seconds: 2), // Durasi notifikasi
+                            ),
+                          ),
+                          Navigator.pop(context)
+                      }
+                      }
+                    });
+
                   }, child: Text("TAMBAH DATA", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.white),)),
               ),
             ],
@@ -447,51 +537,66 @@ class _AddPenimbanganPageState extends State<AddPenimbanganPage> {
                   Container(
                     height: 280,
                     width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: 20,
-                      itemBuilder: (BuildContext context,index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: FutureBuilder(
+                      future: _balitaController.fetchBalita(),
+                      builder: (BuildContext context,snapshot) {
+                        if(snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }else if(snapshot.hasData) {
+                          final balitas = snapshot.data;
+                          return ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: balitas.length,
+                          itemBuilder: (BuildContext context,index) {
+                            final balita = balitas[index];
+                            print(balita);
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 6),
+                              child: Column(
                                 children: [
-                                  Container(
-                                    constraints: BoxConstraints(maxWidth:260,),
-                                    child: SingleChildScrollView(scrollDirection: Axis.horizontal ,child: Text("${index + 1}.  Luh Debi Pramesty", style: inclusiveSans.copyWith(fontSize: 14,color: Colors.grey[600],fontWeight: FontWeight.w600),textAlign: TextAlign.start,))),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                      backgroundColor: MaterialStatePropertyAll(birulaut),
-                                      padding: MaterialStatePropertyAll(const EdgeInsets.symmetric(vertical: 8)),
-                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10.0), // Sesuaikan dengan nilai yang diinginkan
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        constraints: BoxConstraints(maxWidth:260,),
+                                        child: SingleChildScrollView(scrollDirection: Axis.horizontal ,child: Text("${index + 1}.  ${balita['nama']}", style: inclusiveSans.copyWith(fontSize: 14,color: Colors.grey[600],fontWeight: FontWeight.w600),textAlign: TextAlign.start,))),
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          backgroundColor: MaterialStatePropertyAll(birulaut),
+                                          padding: MaterialStatePropertyAll(const EdgeInsets.symmetric(vertical: 8)),
+                                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10.0), // Sesuaikan dengan nilai yang diinginkan
+                                            ),
+                                          ),
                                         ),
+                                        onPressed: () {
+                                          String data = balita['nama'];
+                                          setState(() {
+                                            _namaBalitaController.text = data;
+                                            _idBalitaController.text = balita['id'].toString();
+                                          });
+                                          Navigator.of(context).pop();
+                                          widget.searchTimbangan('');
+                                        },
+                                        child: Text("Pilih", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.white),)
                                       ),
-                                    ),
-                                    onPressed: () {
-                                      String data = "Lanang Debi Sayang";
-                                      setState(() {
-                                        _namaBalitaController.text = data;
-                                        print(_namaBalitaController.text);
-                                      });
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text("Pilih", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.white),)
+                                    ],
                                   ),
+                                  Divider(
+                                    height: 1,
+                                    thickness: 1,
+                                    color: Colors.grey[400],
+                                  )
                                 ],
                               ),
-                              Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Colors.grey[400],
-                              )
-                            ],
-                          ),
+                            );
+                          }
                         );
-                      }
+                        }else {
+                          return Center(child: Text("Belum ada data"),);
+                        }
+                      },
                     )
                   )
                 ],

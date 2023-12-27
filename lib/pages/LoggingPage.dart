@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nutricare/api/balita.dart';
 import 'package:nutricare/api/ortu.dart';
+import 'package:nutricare/api/timbangan.dart';
 import 'package:nutricare/api/user.dart';
 import 'package:nutricare/models/Balita.dart';
 import 'package:nutricare/models/OrangTua.dart';
@@ -41,28 +42,110 @@ class _LoggingPageState extends State<LoggingPage> {
   ];
 
   late OrangTua _orangTua;
-  late String id;
   bool isLoadData = false;
-
+  
+  //API
   final UserController _userController = UserController();
   final OrtuController _ortuController = OrtuController();
   final BalitaController _balitaController = BalitaController();
+  final TimbanganController _timbanganController = TimbanganController();
+  TextEditingController _searchOrtuController = TextEditingController();
+  TextEditingController _searchBalitaController = TextEditingController();
+  TextEditingController _searchTimbanganController = TextEditingController();
+  List<dynamic> filteredOrtu = [];
+  List<dynamic> filteredBalita = [];
+  List<dynamic> filteredTimbangan = [];
   late User _activeUser = User(id: 0, fullname: "", role: "", image: "");
 
+  void searchOrtu (String query) async {
+    String value = _searchOrtuController.text;
+    if (value.isEmpty) {
+      await _ortuController.fetchOrtu().then((value) {
+        List<dynamic> data = value;
+        setState(() {
+          filteredOrtu = data;
+        });
+      });
+
+      return;
+    }
+
+    await _ortuController.fetchOrtu().then((ortu) {
+      List<dynamic> ortuList = ortu;
+
+      setState(() {
+        filteredOrtu = ortuList
+        .where((ortuas) =>
+          ortuas['nama_bapak'].toLowerCase().contains(query.toLowerCase()) ||
+          ortuas['nama_ibu'].toLowerCase().contains(query.toLowerCase()))
+        .toList();
+      });
+    });
+  }
+
+  void searchBalita (String query) async {
+    String value = _searchBalitaController.text;
+    if (value.isEmpty) {
+      await _balitaController.fetchBalita().then((value) {
+        List<dynamic> data = value;
+        setState(() {
+          filteredBalita = data;
+        });
+      });
+
+      return;
+    }
+
+    await _balitaController.fetchBalita().then((balita) {
+      List<dynamic> balitaList = balita;
+      setState(() {
+        filteredBalita = balitaList
+        .where((balitas) =>
+          balitas['nama'].toLowerCase().contains(query.toLowerCase()) ||
+          balitas['nik_balita'].toString().toLowerCase().contains(query.toLowerCase()))
+        .toList();
+      });
+    });
+  }
+
+  void searchTimbangan (String query) async {
+    String value = _searchTimbanganController.text;
+    if (value.isEmpty) {
+      await _timbanganController.fetchTimbangan().then((value) {
+        List<dynamic> data = value;
+        setState(() {
+          filteredTimbangan = data;
+        });
+      });
+
+      return;
+    }
+
+    await _timbanganController.fetchTimbangan().then((timbangan) {
+      List<dynamic> timbanganList = timbangan;
+      setState(() {
+        filteredTimbangan = timbanganList
+        .where((timbangans) =>
+          timbangans['balita']['nama'].toLowerCase().contains(query.toLowerCase()))
+        .toList();
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
       _userController.fetchUser().then((value) => {
-      if (value != null) {
-        setState(() {
-          _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image']);
-          isLoadData = true;
-        })
-        
-      }
-    });
-    
+        if (value != null) {
+          setState(() {
+            _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image']);
+            isLoadData = true;
+          })
+        }
+      });
+      searchOrtu('');
+      searchBalita('');
+      searchTimbangan('');
   }
 
   
@@ -95,7 +178,7 @@ class _LoggingPageState extends State<LoggingPage> {
                 )
               )
             ),
-             tabs: tabs,
+            tabs: tabs,
           ),
         ),
         body: TabBarView(
@@ -113,39 +196,43 @@ class _LoggingPageState extends State<LoggingPage> {
                         children: [
                           Expanded(
                             child: TextFormField(
-                            style: inclusiveSans,
-                            decoration: InputDecoration(
-                                hintText: 'Cari Data Orang Tua...',
-                                hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 13),
-                                focusColor: Colors.black,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 12),
-                                prefixIcon: Icon(Icons.search, color: biruungu,),
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2
+                              controller: _searchOrtuController,
+                              onChanged: (value) {
+                                searchOrtu(value);
+                              },
+                              style: inclusiveSans,
+                              decoration: InputDecoration(
+                                  hintText: 'Cari Data Orang Tua...',
+                                  hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 13),
+                                  focusColor: Colors.black,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 12),
+                                  prefixIcon: Icon(Icons.search, color: biruungu,),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10))),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2 // Warna border ketika dalam keadaan fokus
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
                                     ),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10))),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2 // Warna border ketika dalam keadaan fokus
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2 // Warna border ketika tidak dalam keadaan fokus
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
                                     ),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2 // Warna border ketika tidak dalam keadaan fokus
-                                    ),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                              ),
-                          ),
+                                ),
+                            ),
                           ),
                           Visibility(
                             visible:  _activeUser.role == "petugas" ? true : false,
@@ -184,18 +271,24 @@ class _LoggingPageState extends State<LoggingPage> {
                         width: width,
                         height: height - 320,
                         child:  FutureBuilder(
-
-                          future: _ortuController.fetchOrtu() ,
+                          future: _ortuController.fetchOrtu(),
                           builder: (BuildContext context,snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return ShimmerData();
-                            }else if(snapshot.hasData) {
+                            } else if(snapshot.hasData) {
                               final orangTuas = snapshot.data;
+                              if (filteredOrtu.isEmpty) {
+                                // Tampilkan pesan jika filteredProducts kosong
+                                return Text(
+                                  'Tidak ada hasil', style: inclusiveSans.copyWith(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.grey[400]),
+                                  textAlign: TextAlign.center,
+                                );
+                              }
                               return ListView.builder(
-                              itemCount: orangTuas.length,
+                              itemCount: filteredOrtu.length,
                               scrollDirection: Axis.vertical,
                               itemBuilder: (BuildContext context, index) {
-                                final data = orangTuas[index];
+                                final data = filteredOrtu[index];
                                 return GestureDetector(
                                   onTap: () {
                                     _displayDetailOrtu(context,data['id'].toString());
@@ -268,7 +361,78 @@ class _LoggingPageState extends State<LoggingPage> {
                                                   ),
                                                   GestureDetector(
                                                     onTap: () {
-                                                      _showCupertinoDialog(context,'Orang Tua',data['id'].toString());
+                                                      showDialog(
+                                                        context: context,
+                                                        barrierDismissible: false,
+                                                        builder: (BuildContext context) {
+                                                          return AlertDialog(
+                                                            backgroundColor: Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(15)
+                                                            ),
+                                                            elevation: 5,
+                                                            content: Container(
+                                                              width: 200,
+                                                              height: 368,
+                                                              child: Column(
+                                                                children: [
+                                                                  Container(
+                                                                    width: width,
+                                                                    height: 30,
+                                                                    alignment: Alignment.centerRight,
+                                                                    child: GestureDetector(
+                                                                      onTap: () {
+                                                                        Navigator.of(context).pop();
+                                                                      },
+                                                                      child: Icon(Icons.close_rounded, color: biruungu,)
+                                                                    ),
+                                                                  ),
+                                                                  Image.asset("assets/images/Trash.png", scale: 1.2,),
+                                                                  Text("Hapus Data Orang Tua", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w900), textAlign: TextAlign.center,),
+                                                                  const SizedBox(
+                                                                    height: 5,
+                                                                  ),
+                                                                  Text("Anda yakin ingin menghapus data ini?", style: inclusiveSans.copyWith(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+                                                                  const SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 125,
+                                                                    child: FilledButton(
+                                                                      style: ButtonStyle(
+                                                                        backgroundColor: MaterialStatePropertyAll(biruungu)
+                                                                      ),
+                                                                      onPressed: () async {
+                                                                        await _ortuController.deleteOrtu(data['id'].toString());
+                                                                        Navigator.of(context).pop();
+                                                                      },
+                                                                      child: Text("Iya, hapus", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),)
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 125,
+                                                                    child: FilledButton(
+                                                                      style: ButtonStyle(
+                                                                        backgroundColor: MaterialStatePropertyAll(Colors.white),
+                                                                        side: MaterialStatePropertyAll(
+                                                                          BorderSide(
+                                                                            color:  Colors.red,
+                                                                            width: 1.5
+                                                                          )
+                                                                        )
+                                                                      ),
+                                                                      onPressed: () {
+                                                                        Navigator.of(context).pop();
+                                                                      },
+                                                                      child: Text("Batal", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),)
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )
+                                                          );
+                                                        },
+                                                      );
                                                     },
                                                     child: Icon(Icons.delete_forever_sharp,color: Colors.red[400],)
                                                   )
@@ -283,9 +447,9 @@ class _LoggingPageState extends State<LoggingPage> {
                                 );
                               }
                             );
-                            }else {
+                            } else {
                               return Center(
-                                child: Text("Belum ada data Orang Tua",style: inclusiveSans.copyWith(fontSize: 20,fontWeight: FontWeight.bold),),
+                                child: Text("Tidak ada data Orang Tua", style: inclusiveSans.copyWith(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.grey[400]),),
                               );
                             }
                           }
@@ -310,39 +474,43 @@ class _LoggingPageState extends State<LoggingPage> {
                         children: [
                           Expanded(
                             child: TextFormField(
-                            style: inclusiveSans,
-                            decoration: InputDecoration(
-                                hintText: 'Cari Data Balita...',
-                                hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 13),
-                                focusColor: Colors.black,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 12),
-                                prefixIcon: Icon(Icons.search, color: biruungu,),
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2
+                              controller: _searchBalitaController,
+                              onChanged: (value) {
+                                searchBalita(value);
+                              },
+                              style: inclusiveSans,
+                              decoration: InputDecoration(
+                                  hintText: 'Cari Data Balita...',
+                                  hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 13),
+                                  focusColor: Colors.black,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 12),
+                                  prefixIcon: Icon(Icons.search, color: biruungu,),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10))),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2 // Warna border ketika dalam keadaan fokus
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
                                     ),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10))),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2 // Warna border ketika dalam keadaan fokus
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2 // Warna border ketika tidak dalam keadaan fokus
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
                                     ),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2 // Warna border ketika tidak dalam keadaan fokus
-                                    ),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                              ),
-                          ),
+                                ),
+                            ),
                           ),
                           Visibility(
                             visible:  _activeUser.role == "petugas" ? true : false,
@@ -385,13 +553,20 @@ class _LoggingPageState extends State<LoggingPage> {
                           builder: (BuildContext context,snapshot) {
                             if(snapshot.connectionState == ConnectionState.waiting) {
                               return ShimmerData();
-                            }else if(snapshot.hasData) {
+                            } else if(snapshot.hasData) {
                               final balitas = snapshot.data;
+                              if (filteredBalita.isEmpty) {
+                                // Tampilkan pesan jika filteredProducts kosong
+                                return Text(
+                                  'Tidak ada hasil', style: inclusiveSans.copyWith(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.grey[400]),
+                                  textAlign: TextAlign.center,
+                                );
+                              }
                               return ListView.builder(
-                              itemCount: balitas.length,
+                              itemCount: filteredBalita.length,
                               scrollDirection: Axis.vertical,
                               itemBuilder: (BuildContext context, index) {
-                                final balita = balitas[index];
+                                final balita = filteredBalita[index];
                                 return GestureDetector(
                                   onTap: () {
                                     _displayDetailBalita(context,balita['id'].toString());
@@ -465,7 +640,78 @@ class _LoggingPageState extends State<LoggingPage> {
                                                   ),
                                                   GestureDetector(
                                                     onTap: () {
-                                                      _showCupertinoDialog(context,'Balita','0');
+                                                      showDialog(
+                                                        context: context,
+                                                        barrierDismissible: false,
+                                                        builder: (BuildContext context) {
+                                                          return AlertDialog(
+                                                            backgroundColor: Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(15)
+                                                            ),
+                                                            elevation: 5,
+                                                            content: Container(
+                                                              width: 200,
+                                                              height: 368,
+                                                              child: Column(
+                                                                children: [
+                                                                  Container(
+                                                                    width: width,
+                                                                    height: 30,
+                                                                    alignment: Alignment.centerRight,
+                                                                    child: GestureDetector(
+                                                                      onTap: () {
+                                                                        Navigator.of(context).pop();
+                                                                      },
+                                                                      child: Icon(Icons.close_rounded, color: biruungu,)
+                                                                    ),
+                                                                  ),
+                                                                  Image.asset("assets/images/Trash.png", scale: 1.2,),
+                                                                  Text("Hapus Data Balita", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w900), textAlign: TextAlign.center,),
+                                                                  const SizedBox(
+                                                                    height: 5,
+                                                                  ),
+                                                                  Text("Anda yakin ingin menghapus data ini?", style: inclusiveSans.copyWith(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+                                                                  const SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 125,
+                                                                    child: FilledButton(
+                                                                      style: ButtonStyle(
+                                                                        backgroundColor: MaterialStatePropertyAll(biruungu)
+                                                                      ),
+                                                                      onPressed: () async {
+                                                                        await _balitaController.deleteBalita(balita['id'].toString());
+                                                                        Navigator.of(context).pop();
+                                                                      },
+                                                                      child: Text("Iya, hapus", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),)
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 125,
+                                                                    child: FilledButton(
+                                                                      style: ButtonStyle(
+                                                                        backgroundColor: MaterialStatePropertyAll(Colors.white),
+                                                                        side: MaterialStatePropertyAll(
+                                                                          BorderSide(
+                                                                            color:  Colors.red,
+                                                                            width: 1.5
+                                                                          )
+                                                                        )
+                                                                      ),
+                                                                      onPressed: () {
+                                                                        Navigator.of(context).pop();
+                                                                      },
+                                                                      child: Text("Batal", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),)
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )
+                                                          );
+                                                        },
+                                                      );
                                                     },
                                                     child: Icon(Icons.delete_forever_sharp,color: Colors.red[400],)
                                                   )
@@ -482,7 +728,7 @@ class _LoggingPageState extends State<LoggingPage> {
                             );
                             }else {
                               return Center(
-                                child: Text("Belum ada data Balita",style: inclusiveSans.copyWith(fontSize: 20,fontWeight: FontWeight.bold),),
+                                child: Text("Tidak ada data Balita", style: inclusiveSans.copyWith(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.grey[400]),),
                               );
                             }
                           }
@@ -507,39 +753,43 @@ class _LoggingPageState extends State<LoggingPage> {
                         children: [
                           Expanded(
                             child: TextFormField(
-                            style: inclusiveSans,
-                            decoration: InputDecoration(
-                                hintText: 'Cari Data Penimbangan..',
-                                hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 13),
-                                focusColor: Colors.black,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 12),
-                                prefixIcon: Icon(Icons.search, color: biruungu,),
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2
+                              controller: _searchTimbanganController,
+                              onChanged: (value) {
+                                searchTimbangan(value);
+                              },
+                              style: inclusiveSans,
+                              decoration: InputDecoration(
+                                  hintText: 'Cari Data Penimbangan..',
+                                  hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 13),
+                                  focusColor: Colors.black,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 12),
+                                  prefixIcon: Icon(Icons.search, color: biruungu,),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10))),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2 // Warna border ketika dalam keadaan fokus
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
                                     ),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10))),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2 // Warna border ketika dalam keadaan fokus
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: biruungu,
+                                        width: 2 // Warna border ketika tidak dalam keadaan fokus
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
                                     ),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: biruungu,
-                                      width: 2 // Warna border ketika tidak dalam keadaan fokus
-                                    ),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                              ),
-                          ),
+                                ),
+                            ),
                           ),
                           Visibility(
                             visible:  _activeUser.role == "petugas" ? true : false,
@@ -550,7 +800,7 @@ class _LoggingPageState extends State<LoggingPage> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(context, MaterialPageRoute(builder: (context){
-                                  return const AddPenimbanganPage();
+                                  return AddPenimbanganPage(searchTimbangan: searchTimbangan,);
                                 }));
                               },
                               child: Container(
@@ -577,105 +827,212 @@ class _LoggingPageState extends State<LoggingPage> {
                       Container(
                         width: width,
                         height: height - 320,
-                        child: ListView.builder(
-                          itemCount: 10,
-                          scrollDirection: Axis.vertical,
-                          itemBuilder: (BuildContext context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                _displayDetailPenimbangan(context);
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                width: width,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8), // Warna latar belakang container
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color.fromARGB(255, 232, 232, 232), // Warna bayangan
-                                      offset: Offset(0, 2.5), // Offset bayangan (x, y)
-                                      blurRadius: 0.5,
-                                      spreadRadius: 0.0, // Radius penyebaran bayangan
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Flexible(
-                                      fit: FlexFit.loose,
-                                      child: Container(
-                                        width: 50,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: biruungu,
-                                          borderRadius: BorderRadius.only(topLeft: Radius.circular(8),bottomLeft: Radius.circular(8))
-                                        ),
-                                        child: Icon(Icons.baby_changing_station_outlined,color: Colors.white,),
-                                      ),
-                                    ),
-                                    Flexible(
-                                      fit: FlexFit.loose,
-                                      flex: 4,
-                                      child: Container(
+                        child: FutureBuilder(
+                          future: _timbanganController.fetchTimbangan(),
+                          builder: (BuildContext context, snapshot) {
+                            if(snapshot.connectionState == ConnectionState.waiting) {
+                              return ShimmerData();
+                            } else if(snapshot.hasData) {
+                              final timbangans = snapshot.data;
+                              if (filteredTimbangan.isEmpty) {
+                                // Tampilkan pesan jika filteredProducts kosong
+                                return Text(
+                                  'Tidak ada hasil', style: inclusiveSans.copyWith(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.grey[400]),
+                                  textAlign: TextAlign.center,
+                                );
+                              }
+                              return ListView.builder(
+                                itemCount: filteredTimbangan.length,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (BuildContext context, index) {
+                                  final timbangan = filteredTimbangan[index];
+                                  final nama = timbangan['balita']['nama'];
+                                  print(timbangan);
+                                  return GestureDetector(
+                                    onTap: () {
+                                      _displayDetailPenimbangan(context,timbangan['id'].toString(),);
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 10),
+                                      width: width,
+                                      height: 50,
+                                      decoration: BoxDecoration(
                                         color: Colors.white,
-                                        alignment: Alignment.centerLeft,
-                                        padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 12),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text("Lanang Surya Darma",style: inclusiveSans.copyWith(color: Colors.black87),),
-                                          
-                                            Row(
-                                              children: [
-                                                Text("BB : 10kg",style: poppins.copyWith(color: Colors.grey[600],fontSize: 11,),),
-                                                const SizedBox(
-                                                  width: 20,
+                                        borderRadius: BorderRadius.circular(8), // Warna latar belakang container
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color.fromARGB(255, 232, 232, 232), // Warna bayangan
+                                            offset: Offset(0, 2.5), // Offset bayangan (x, y)
+                                            blurRadius: 0.5,
+                                            spreadRadius: 0.0, // Radius penyebaran bayangan
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Flexible(
+                                            fit: FlexFit.loose,
+                                            child: Container(
+                                              width: 50,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                color: biruungu,
+                                                borderRadius: BorderRadius.only(topLeft: Radius.circular(8),bottomLeft: Radius.circular(8))
+                                              ),
+                                              child: Icon(Icons.baby_changing_station_outlined,color: Colors.white,),
+                                            ),
+                                          ),
+                                          Flexible(
+                                            fit: FlexFit.loose,
+                                            flex: 4,
+                                            child: Container(
+                                              color: Colors.white,
+                                              alignment: Alignment.centerLeft,
+                                              padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 12),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(nama,style: inclusiveSans.copyWith(color: Colors.black87),),
+                                                
+                                                  Row(
+                                                    children: [
+                                                      Text("BB : ${timbangan['berat_badan']}kg",style: poppins.copyWith(color: Colors.grey[600],fontSize: 11,),),
+                                                      const SizedBox(
+                                                        width: 20,
+                                                      ),
+                                                      Text("TB : ${timbangan['tinggi_badan']}cm",style: poppins.copyWith(color: Colors.grey[600],fontSize: 11,),),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible:  _activeUser.role == "petugas" ? true : false,
+                                            child: Flexible(
+                                              fit: FlexFit.loose,
+                                              flex: 2,
+                                              child: Container(
+                                                margin: const EdgeInsets.only(left: 20),
+                                                width: width,
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(context, MaterialPageRoute(builder: (context){
+                                                          return UpdatePenimbanganPage(id: timbangan['id'].toString(),);
+                                                        }));
+                                                      },
+                                                      child: Icon(Icons.edit_square,color: Colors.amber[600],)
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        showDialog(
+                                                          context: context,
+                                                          barrierDismissible: false,
+                                                          builder: (BuildContext context) {
+                                                            return AlertDialog(
+                                                              backgroundColor: Colors.white,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(15)
+                                                              ),
+                                                              elevation: 5,
+                                                              content: Container(
+                                                                width: 200,
+                                                                height: 368,
+                                                                child: Column(
+                                                                  children: [
+                                                                    Container(
+                                                                      width: width,
+                                                                      height: 30,
+                                                                      alignment: Alignment.centerRight,
+                                                                      child: GestureDetector(
+                                                                        onTap: () {
+                                                                          Navigator.of(context).pop();
+                                                                        },
+                                                                        child: Icon(Icons.close_rounded, color: biruungu,)
+                                                                      ),
+                                                                    ),
+                                                                    Image.asset("assets/images/Trash.png", scale: 1.2,),
+                                                                    Text("Hapus Data Timbangan", style: inclusiveSans.copyWith(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w900), textAlign: TextAlign.center,),
+                                                                    const SizedBox(
+                                                                      height: 5,
+                                                                    ),
+                                                                    Text("Anda yakin ingin menghapus data ini?", style: inclusiveSans.copyWith(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+                                                                    const SizedBox(
+                                                                      height: 10,
+                                                                    ),
+                                                                    SizedBox(
+                                                                      width: 125,
+                                                                      child: FilledButton(
+                                                                        style: ButtonStyle(
+                                                                          backgroundColor: MaterialStatePropertyAll(biruungu)
+                                                                        ),
+                                                                        onPressed: () async {
+                                                                         await _timbanganController.deleteTimbangan(timbangan['id'].toString()).then((value) => {
+                                                                          if(value != null) {
+                                                                            if(value['success'] == true) {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Text('Data berhasil dihapus'),
+                                                                                  duration: Duration(seconds: 2), // Durasi notifikasi
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.pop(context)
+                                                                          }
+                                                                          }
+                                                                        });
+                                                                      
+                                                                        },
+                                                                        child: Text("Iya, hapus", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),)
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      width: 125,
+                                                                      child: FilledButton(
+                                                                        style: ButtonStyle(
+                                                                          backgroundColor: MaterialStatePropertyAll(Colors.white),
+                                                                          side: MaterialStatePropertyAll(
+                                                                            BorderSide(
+                                                                              color:  Colors.red,
+                                                                              width: 1.5
+                                                                            )
+                                                                          )
+                                                                        ),
+                                                                        onPressed: () {
+                                                                          Navigator.of(context).pop();
+                                                                        },
+                                                                        child: Text("Batal", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),)
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              )
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                      child: Icon(Icons.delete_forever_sharp,color: Colors.red[400],)
+                                                    )
+                                                  ],
                                                 ),
-                                                Text("TB : 90cm",style: poppins.copyWith(color: Colors.grey[600],fontSize: 11,),),
-                                              ],
-                                            )
-                                          ],
-                                        ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    Visibility(
-                                      visible:  _activeUser.role == "petugas" ? true : false,
-                                      child: Flexible(
-                                        fit: FlexFit.loose,
-                                        flex: 2,
-                                        child: Container(
-                                          margin: const EdgeInsets.only(left: 20),
-                                          width: width,
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context){
-                                                    return const UpdatePenimbanganPage();
-                                                  }));
-                                                },
-                                                child: Icon(Icons.edit_square,color: Colors.amber[600],)
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  _showCupertinoDialog(context,'Penimbangan','0');
-                                                },
-                                                child: Icon(Icons.delete_forever_sharp,color: Colors.red[400],)
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          }
+                                  );
+                                }
+                              );
+                            } else {
+                              return Center(
+                                child: Text("Tidak ada data Timbangan", style: inclusiveSans.copyWith(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.grey[400]),),
+                              );
+                            }
+                          },
                         ),
                       )
                     ],
@@ -686,44 +1043,6 @@ class _LoggingPageState extends State<LoggingPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Future<void> _showCupertinoDialog(BuildContext context,String title,String id) async {
-    return showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoTheme(
-          data: CupertinoThemeData(
-            brightness: Brightness.light,
-            primaryColor: biruungu,
-            barBackgroundColor: biruungu,
-            scaffoldBackgroundColor: biruungu,
-            applyThemeToAll: true,
-            primaryContrastingColor: biruungu,
-            textTheme: CupertinoTextThemeData(textStyle: inclusiveSans,)
-          ), // Tambahkan tema Cupertino di sini
-          child: CupertinoAlertDialog(
-            title: Text('Hapus Data $title', style: inclusiveSans,),
-            content: Text('Apakah Anda yakin ingin menghapus data ini ?', style: inclusiveSans,),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                onPressed: () async {
-                  await _ortuController.deleteOrtu(id);
-                  Navigator.of(context).pop();
-                },
-                child: Text('Iya, hapus', style: inclusiveSans.copyWith(fontSize: 14, color: Colors.green[700], fontWeight: FontWeight.w600),),
-              ),
-              CupertinoDialogAction(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Tidak', style: inclusiveSans.copyWith(fontSize: 14, color: merahapp, fontWeight: FontWeight.w600),),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -932,8 +1251,6 @@ class _LoggingPageState extends State<LoggingPage> {
 
     try {
       final balita = await _balitaController.fetchBalitaId(id);
-      print(balita);
-
       Navigator.of(context).pop();
        await showModalBottomSheet(
       context: context, 
@@ -1189,10 +1506,23 @@ class _LoggingPageState extends State<LoggingPage> {
    
   }
 
-  Future _displayDetailPenimbangan(BuildContext context) async{
+  Future _displayDetailPenimbangan(BuildContext context,id) async{
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    await showModalBottomSheet(
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(color: biruungu,),
+        );
+      },
+    );
+
+    try {
+      final penimbangan = await _timbanganController.fetchTimbanganId(id);
+      Navigator.of(context).pop();
+      await showModalBottomSheet(
       context: context, 
       isScrollControlled: true,
       clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -1238,7 +1568,7 @@ class _LoggingPageState extends State<LoggingPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Nama Balita", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                      Text("Ketut Sri Diana Lestari", style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                      Text(penimbangan['balita']['nama'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
                     ],
                   ),
                 ),
@@ -1260,7 +1590,7 @@ class _LoggingPageState extends State<LoggingPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Tanggal Penimbangan", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                      Text("2023-10-20", style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                      Text(penimbangan["tanggal_timbangan"], style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
                     ],
                   ),
                 ),
@@ -1284,7 +1614,7 @@ class _LoggingPageState extends State<LoggingPage> {
                       Text("Berat Badan", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
                       RichText(
                         text: TextSpan(
-                          text: "13 ",
+                          text:penimbangan['berat_badan'].toString(),
                           style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                           children: [
                             TextSpan(
@@ -1317,7 +1647,7 @@ class _LoggingPageState extends State<LoggingPage> {
                       Text("Tinggi/Panjang Badan", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
                       RichText(
                         text: TextSpan(
-                          text: "110 ",
+                          text: penimbangan['tinggi_badan'].toString(),
                           style: poppins.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                           children: [
                             TextSpan(
@@ -1348,7 +1678,7 @@ class _LoggingPageState extends State<LoggingPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Keterangan", style: inclusiveSans.copyWith(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),),
-                      Text("Naik (N)", style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
+                      Text(penimbangan['keterangan']['keterangan'], style: inclusiveSans.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),),
                     ],
                   ),
                 ),
@@ -1450,6 +1780,13 @@ class _LoggingPageState extends State<LoggingPage> {
         )
       )
     );
+    } catch (e) {
+      Navigator.of(context).pop();
+
+    // Menampilkan pesan kesalahan jika diperlukan
+      print("Error fetching data $e");
+    }
+
   }
 
 }
@@ -1508,3 +1845,7 @@ class ShimmerData extends StatelessWidget {
     );
   }
 }
+
+
+
+

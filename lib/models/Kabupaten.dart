@@ -1,10 +1,10 @@
 class KabupatenModel {
   final String id;
-  final String nama;
+  String? nama;
 
   KabupatenModel({
     required this.id,
-    required this.nama
+    this.nama
   });
   
   factory KabupatenModel.fromJson(Map<String, dynamic> json) {

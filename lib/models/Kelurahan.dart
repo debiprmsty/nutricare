@@ -14,7 +14,10 @@ class KelurahanModel {
     );
   }
 
-  static List<KelurahanModel> fromJsonList(List list) {
-    return list.map((item) => KelurahanModel.fromJson(item)).toList();
+  // static List<KelurahanModel> fromJsonList(List list) {
+  //   return list.map((item) => KelurahanModel.fromJson(item)).toList();
+  // }
+   static List<KelurahanModel> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((data) => KelurahanModel.fromJson(data)).toList();
   }
 }

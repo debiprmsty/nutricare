@@ -76,10 +76,10 @@ class _LoginPagePetugasState extends State<LoginPagePetugas> {
     double width = MediaQuery.of(context).size.width;
     
     return Scaffold(
-      body: Center(
+      body: SingleChildScrollView(
         child: Container(
           width: width,
-          height: height,
+          height: height * 1.5,
           child: Stack(
             children: [
               Container(

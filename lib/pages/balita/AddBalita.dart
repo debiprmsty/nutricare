@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nutricare/api/balita.dart';
 import 'package:nutricare/api/ortu.dart';
+import 'package:nutricare/api/user.dart';
 import 'package:nutricare/models/OrangTua.dart';
+import 'package:nutricare/models/User.dart';
 import 'package:nutricare/theme.dart';
 
 class AddBalitaPage extends StatefulWidget {
@@ -26,6 +28,8 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
 
   OrtuController _ortuController = OrtuController();
   BalitaController _balitaController = BalitaController();
+  final UserController _userController = UserController();
+  late User _activeUser = User(id: 0, fullname: "", role: "", image: "");
   
 
   Future<void> _selectDate(BuildContext context) async {
@@ -54,6 +58,19 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
   }
 
   String selectedValue = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _userController.fetchUser().then((value) => {
+      print(value),
+      if (value != null) {
+        setState(() {
+          _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image'],nama_dusun: value['nama_dusun'],);
+        })
+      }
+    });
+  }
 
 
   @override
@@ -619,6 +636,7 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
                     final idKK = _idKKController.text;
                     final idOrtu = _idOrtuController.text;
                     final jenis_kelamin = selectedValue;
+                    final String nama_posko = _activeUser.nama_dusun.toString();
 
                     final data = {
                       "nik_balita" : nik_balita,
@@ -631,7 +649,7 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
                       "jenis_kelamin" : jenis_kelamin,
                     };
                     
-                    await _balitaController.addBalita(nik_balita, nama, tanggal_lahir, umur, jenis_kelamin, nama_dusun, idKK, idOrtu).then((value) => {
+                    await _balitaController.addBalita(nik_balita, nama, tanggal_lahir, umur, jenis_kelamin, nama_dusun, idKK, idOrtu, nama_posko).then((value) => {
                       if(value['success'] == true) {
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -653,7 +671,6 @@ class _AddBalitaPageState extends State<AddBalitaPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
     );
-   
   }
 
   Future _displayBottomSheet(BuildContext context) async{

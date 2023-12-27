@@ -55,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   CircleAvatar(
                     radius: 45,
-                    backgroundImage: _activeUser.image != "" ? NetworkImage("https://testchairish.000webhostapp.com/api/user-image/${_activeUser.image}",) : NetworkImage("https://afpertise.com/media/2020/09/Member-1.jpg",) ,
+                    backgroundImage: _activeUser.image != "" ? NetworkImage("https://testchairish.000webhostapp.com/api/user-image/${_activeUser.image}",) : NetworkImage("https://th.bing.com/th/id/OIP.39IRe__qOkrugBUU_FWeyQAAAA?w=327&h=327&rs=1&pid=ImgDetMain",) ,
                   ),
                   const SizedBox(
                     height: 15,
@@ -262,44 +262,93 @@ class _ProfilePageState extends State<ProfilePage> {
                       width: 200,
                       height: 40,
                       child: FilledButton(
-                        onPressed: () {
-                          showDialog(context: context, builder: (BuildContext context) {
-                           return AlertDialog(
-                              
-                                title: Text('Keluar dari Akun ini ?',textAlign: TextAlign.center,style: inclusiveSans.copyWith(fontWeight: FontWeight.bold,color: Colors.black),),
-                                backgroundColor: Colors.white,
-                                actionsAlignment: MainAxisAlignment.spaceEvenly,
-                                actions: [
-                                  ElevatedButton(style: ButtonStyle(
-                                    backgroundColor: MaterialStatePropertyAll(biruungu)
-                                  ), onPressed: ()async{
-                                    await _userController.logout();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('Anda berhasil logout !'),
-                                        duration: Duration(seconds: 2), // Durasi notifikasi
-                                      ),
-                                    );
-                                     Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => AwalPageRole()),
-                                      );
-                                  }, child: Text("iya",style: inclusiveSans.copyWith(fontSize: 14),)),
-                                  ElevatedButton(style: ButtonStyle(
-                                    backgroundColor: MaterialStatePropertyAll(biruungu)
-                                  ), onPressed: (){
-                                    Navigator.of(context).pop();
-                                  }, child: Text("tidak",style: inclusiveSans.copyWith(fontSize: 14),)),
-                                ],
-                              );
-                          });
-                          // Navigator.push(context, MaterialPageRoute(builder: (context){
-                          //   return const LoginPagePetugas();
-                          // }));
-                        },
                         style: ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(biruungu)
-                        ), 
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)
+                                ),
+                                elevation: 5,
+                                content: Container(
+                                  width: 200,
+                                  height: 310,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: width,
+                                        height: 30,
+                                        alignment: Alignment.centerRight,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Icon(Icons.close_rounded, color: biruungu,)
+                                        ),
+                                      ),
+                                      Image.asset("assets/images/Logout.png", scale: 1.2,),
+                                      Text("Anda yakin ingin keluar dari akun ini?", style: inclusiveSans.copyWith(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w900), textAlign: TextAlign.center,),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SizedBox(
+                                        width: 110,
+                                        child: FilledButton(
+                                          style: ButtonStyle(
+                                            backgroundColor: MaterialStatePropertyAll(biruungu)
+                                          ),
+                                          onPressed: ()async{
+                                            await _userController.logout();
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                                content: Text('Anda berhasil logout !'),
+                                                duration: Duration(seconds: 2), // Durasi notifikasi
+                                              ),
+                                            );
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => AwalPageRole()),
+                                            );
+                                          },
+                                          child: Text("Iya, keluar", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold),)
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 110,
+                                        child: FilledButton(
+                                          style: ButtonStyle(
+                                            backgroundColor: MaterialStatePropertyAll(Colors.white),
+                                            side: MaterialStatePropertyAll(
+                                              BorderSide(
+                                                color:  Colors.blueGrey,
+                                                width: 2
+                                              )
+                                            )
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text("Batal", style: inclusiveSans.copyWith(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),)
+                                        ),
+                                      ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                )
+                              );
+                            },
+                          );
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

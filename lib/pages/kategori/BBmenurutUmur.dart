@@ -42,7 +42,7 @@ class _BBmenurutUmurPageState extends State<BBmenurutUmurPage> {
                 TextFormField(
                 style: inclusiveSans,
                 decoration: InputDecoration(
-                    hintText: 'Cari Data Penimbangan..',
+                    hintText: 'Cari Data Balita..',
                     hintStyle: inclusiveSans.copyWith(color: Colors.grey, fontSize: 13),
                     focusColor: Colors.black,
                     contentPadding: const EdgeInsets.symmetric(
@@ -173,25 +173,6 @@ class _BBmenurutUmurPageState extends State<BBmenurutUmurPage> {
                                 ),
                               ),
                             ),
-                            Flexible(
-                              fit: FlexFit.loose,
-                              flex: 2,
-                              child: Container(
-                                padding: EdgeInsets.only(right: 8),
-                                margin: const EdgeInsets.only(left: 20),
-                                width: width,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Icon(Icons.edit_square,color: Colors.amber[600],),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    Icon(Icons.delete_forever_sharp,color: Colors.red[400],)
-                                  ],
-                                ),
-                              ),
-                            )
                           ],
                         ),
                       );

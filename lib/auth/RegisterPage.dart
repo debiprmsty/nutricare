@@ -339,46 +339,40 @@ class _RegisterPageState extends State<RegisterPage> {
                                 height: 70,
                                 margin: const EdgeInsets.symmetric(horizontal: 15),
                                 child: DropdownSearch<KabupatenModel>(
-                                  popupProps: PopupProps.menu(
-                                    showSearchBox: true,
-                                    
+                                popupProps: PopupProps.menu(
+                                  showSearchBox: true,
+                                ),
+                                asyncItems: (String filter) async {
+                                  var response = await Dio().get(
+                                    _apiKabupaten,
+                                  );
+                                  var models = KabupatenModel.fromJsonList(response.data);
+                                  return models;
+                                },
+                                dropdownDecoratorProps: DropDownDecoratorProps(
+                                  dropdownSearchDecoration: InputDecoration(
+                                    hintText: "country in menu mode",
+                                    prefixIcon: Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: Icon(Icons.location_on_outlined, color: biruungu,),
+                                    ),
+                                    prefixIconConstraints: BoxConstraints(minWidth: 35)
                                   ),
-                                  asyncItems: (String filter) async {
-                                      var response = await Dio().get(
-                                          _apiKabupaten,
-                                          
-                                      );
-                                      var models = KabupatenModel.fromJsonList(response.data);
-                                      return models;
-
-                                  },
-
-                                  dropdownDecoratorProps: DropDownDecoratorProps(
-
-                                      dropdownSearchDecoration: InputDecoration(
-                                          labelText: "Kabupaten",
-                                          hintText: "country in menu mode",
-                                          prefixIcon: Padding(
-                                            padding: const EdgeInsets.only(right: 12),
-                                            child: Icon(Icons.map,color: biruungu,),
-                                          ),
-                                          prefixIconConstraints: BoxConstraints(minWidth: 35)
-                                          
-                                      ),
-                                  ),
-                                 onChanged: (KabupatenModel? data) {
-                                    setState(() {
-                                      KabupatenModel newData = data!;
-                                      _selectedKabupaten = newData;
-                                      id_kabupaten = newData.id.toString();
-                                      print(id_kabupaten);
-                                      id_kecamatan = newData.id.toString();
-                                      _apiKecamatan = "https://ibnux.github.io/data-indonesia/kecamatan/${id_kecamatan}.json";
-                                    });
-                                  },
-                                  selectedItem: _selectedKabupaten,
-                                  itemAsString: (KabupatenModel? item) => item?.nama ?? "Pilih Kabupaten",
-                                  ),
+                                  baseStyle: inclusiveSans
+                                ),
+                                onChanged: (KabupatenModel? data) {
+                                  setState(() {
+                                    KabupatenModel newData = data!;
+                                    _selectedKabupaten = newData;
+                                    id_kabupaten = newData.id.toString();
+                                    print(id_kabupaten);
+                                    id_kecamatan = newData.id.toString();
+                                    _apiKecamatan = "https://ibnux.github.io/data-indonesia/kecamatan/${id_kecamatan}.json";
+                                  });
+                                },
+                                selectedItem: _selectedKabupaten,
+                                itemAsString: (KabupatenModel? item) => item?.nama ?? "Pilih Kabupaten",
+                                ),
                               ),
                               const SizedBox(
                                 height: 12,
@@ -390,32 +384,26 @@ class _RegisterPageState extends State<RegisterPage> {
                                 child: DropdownSearch<KecamatanModel>(
                                   popupProps: PopupProps.menu(
                                     showSearchBox: true,
-                                    
                                   ),
                                   asyncItems: (String filter) async {
-                                      var response = await Dio().get(
-                                          _apiKecamatan,
-                                          
-                                      );
-                                      var models = KecamatanModel.fromJsonList(response.data);
-                                      return models;
-
+                                    var response = await Dio().get(
+                                      _apiKecamatan,
+                                    );
+                                    var models = KecamatanModel.fromJsonList(response.data);
+                                    return models;
                                   },
-
                                   dropdownDecoratorProps: DropDownDecoratorProps(
-
-                                      dropdownSearchDecoration: InputDecoration(
-                                          labelText: "Kecamatan",
-                                          hintText: "country in menu mode",
-                                          prefixIcon: Padding(
-                                            padding: const EdgeInsets.only(right: 12),
-                                            child: Icon(Icons.map,color: biruungu,),
-                                          ),
-                                          prefixIconConstraints: BoxConstraints(minWidth: 35)
-                                          
+                                    dropdownSearchDecoration: InputDecoration(
+                                      hintText: "country in menu mode",
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.only(right: 12),
+                                        child: Icon(Icons.pin_drop_outlined, color: biruungu,),
                                       ),
+                                      prefixIconConstraints: BoxConstraints(minWidth: 35)
+                                    ),
+                                    baseStyle: inclusiveSans
                                   ),
-                                 onChanged: (KecamatanModel? data) {
+                                  onChanged: (KecamatanModel? data) {
                                     setState(() {
                                       KecamatanModel newData = data!;
                                       _selectedKecamatan = newData;
@@ -426,7 +414,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   },
                                   selectedItem: _selectedKecamatan,
                                   itemAsString: (KecamatanModel? item) => item?.nama ?? "Pilih Kecamatan",
-                                  ),
+                                ),
                               ),
                               const SizedBox(
                                 height: 12,
@@ -438,41 +426,35 @@ class _RegisterPageState extends State<RegisterPage> {
                                 child: DropdownSearch<KelurahanModel>(
                                   popupProps: PopupProps.menu(
                                     showSearchBox: true,
-                                    
                                   ),
                                   asyncItems: (String filter) async {
-                                      var response = await Dio().get(
-                                          _apiKelurahan,
-                                          
-                                      );
-                                      var models = KelurahanModel.fromJsonList(response.data);
-                                      return models;
-
+                                    var response = await Dio().get(
+                                        _apiKelurahan,
+                                    );
+                                    var models = KelurahanModel.fromJsonList(response.data);
+                                    return models;
                                   },
-
                                   dropdownDecoratorProps: DropDownDecoratorProps(
-
-                                      dropdownSearchDecoration: InputDecoration(
-                                          labelText: "Kelurahan",
-                                          hintText: "country in menu mode",
-                                          prefixIcon: Padding(
-                                            padding: const EdgeInsets.only(right: 12),
-                                            child: Icon(Icons.map,color: biruungu,),
-                                          ),
-                                          prefixIconConstraints: BoxConstraints(minWidth: 35)
-                                          
+                                    dropdownSearchDecoration: InputDecoration(
+                                      hintText: "country in menu mode",
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.only(right: 12),
+                                        child: Icon(Icons.navigation_outlined, color: biruungu,),
                                       ),
+                                      prefixIconConstraints: BoxConstraints(minWidth: 35)
+                                    ),
+                                    baseStyle: inclusiveSans
                                   ),
-                                 onChanged: (KelurahanModel? data) {
-                                    setState(() {
-                                      KelurahanModel newData = data!;
-                                      _selectedKelurahan = newData!;
-                                      print(_selectedKelurahan.id);
-                                    });
-                                  },
+                                  onChanged: (KelurahanModel? data) {
+                                      setState(() {
+                                        KelurahanModel newData = data!;
+                                        _selectedKelurahan = newData!;
+                                        print(_selectedKelurahan.id);
+                                      });
+                                    },
                                   selectedItem: _selectedKelurahan,
                                   itemAsString: (KelurahanModel? item) => item?.nama ?? "Pilih Kelurahan",
-                                  ),
+                                ),
                               ),
                               Center(
                                 child: SizedBox(

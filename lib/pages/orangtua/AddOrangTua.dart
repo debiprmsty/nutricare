@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutricare/api/ortu.dart';
 import 'package:nutricare/api/user.dart';
+import 'package:nutricare/models/User.dart';
 import 'package:nutricare/pages/Index.dart';
 import 'package:nutricare/pages/LoggingPage.dart';
 import 'package:nutricare/theme.dart';
@@ -16,6 +17,8 @@ class _AddOrangTuaPageState extends State<AddOrangTuaPage> {
   final _formKey = GlobalKey<FormState>();
   OrtuController _ortuController = OrtuController();
   UserController _activeController = UserController();
+  final UserController _userController = UserController();
+  late User _activeUser = User(id: 0, fullname: "", role: "", image: "");
   
   TextEditingController nik_bapak = TextEditingController();
   TextEditingController _namaBapakController = TextEditingController();
@@ -27,6 +30,14 @@ class _AddOrangTuaPageState extends State<AddOrangTuaPage> {
   @override
   void initState() {
     super.initState();
+    _userController.fetchUser().then((value) => {
+      print(value),
+      if (value != null) {
+        setState(() {
+          _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image'],nama_dusun: value['nama_dusun'],);
+        })
+      }
+    });
   }
 
   @override
@@ -397,10 +408,11 @@ class _AddOrangTuaPageState extends State<AddOrangTuaPage> {
                     String namaIbu = _namaIbuController.text;
                     String namaBapak = _namaBapakController.text;
                     String alamat = _alamatController.text;
+                    final String nama_posko = _activeUser.nama_dusun.toString();
 
                     
 
-                    await _ortuController.addOrtu(noKk, nikBapak, nikIbu, namaBapak, namaIbu, alamat).then((value) => {
+                    await _ortuController.addOrtu(noKk, nikBapak, nikIbu, namaBapak, namaIbu, alamat, nama_posko).then((value) => {
                       if(value != null) {
                         if(value['success'] == true) {
                           ScaffoldMessenger.of(context).showSnackBar(

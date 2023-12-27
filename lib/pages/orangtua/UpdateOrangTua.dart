@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutricare/api/ortu.dart';
+import 'package:nutricare/api/user.dart';
+import 'package:nutricare/models/User.dart';
 import 'package:nutricare/theme.dart';
 
 class UpdateOrtuPage extends StatefulWidget {
@@ -21,19 +23,30 @@ class _UpdateOrtuPageState extends State<UpdateOrtuPage> {
   TextEditingController _idKKController = TextEditingController();
 
   OrtuController _ortuController = OrtuController();
+  final UserController _userController = UserController();
+  late User _activeUser = User(id: 0, fullname: "", role: "", image: "");
 
   @override
   void initState() {
     super.initState();
+    _userController.fetchUser().then((value) => {
+      print(value),
+      if (value != null) {
+        setState(() {
+          _activeUser = User(id: value['id'], fullname: value['fullname'], role: value['role'], image: value['image'],nama_dusun: value['nama_dusun'],);
+        })
+      }
+    });
+
     _ortuController.fetchOrtuId(widget.id).then((value) => {
       if(value != null) {
-        print(value.alamat),
-         setState(() {
+        print(value),
+        setState(() {
           nik_bapak.text = value.nik_bapak.toString();
           _namaBapakController.text = value.nama_bapak;
           nik_ibu.text = value.nik_ibu.toString();
           _namaIbuController.text = value.nama_ibu;
-          _noKKController.text = value.nik_keluarga.toString();
+          _noKKController.text = value.keluarga['nik_keluarga'].toString();
           _alamatController.text = value.alamat;
           _idKKController.text = value.id_kk.toString();
         })
@@ -463,8 +476,9 @@ class _UpdateOrtuPageState extends State<UpdateOrtuPage> {
                     String namaIbu = _namaIbuController.text;
                     String namaBapak = _namaBapakController.text;
                     String alamat = _alamatController.text;
+                    final String nama_posko = _activeUser.nama_dusun.toString();
 
-                    await _ortuController.upateOrtu(idOrtu, idKK, noKk, nikBapak, nikIbu, namaBapak, namaIbu, alamat).then((value) => {
+                    await _ortuController.updateOrtu(idOrtu, idKK, noKk, nikBapak, nikIbu, namaBapak, namaIbu, alamat, nama_posko).then((value) => {
                       if(value != null) {
                         if(value['success'] == true) {
                           ScaffoldMessenger.of(context).showSnackBar(

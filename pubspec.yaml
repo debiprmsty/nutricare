@@ -50,6 +50,8 @@ dependencies:
   dio: ^5.3.3
   dropdown_search: ^5.0.6
   quickalert: ^1.0.2
+  path: ^1.8.3
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:
